@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import Rxos.DesignSystem
 
 Item {
-    id: performance
+    id: sport
     required property RxTokens theme
     required property var telemetry
     required property PresentationFormatter formatter
@@ -11,33 +11,102 @@ Item {
 
     ColumnLayout {
         anchors.fill: parent
-        spacing: performance.theme.space4
+        spacing: sport.theme.space5
+
+        Row {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 16 * sport.theme.scale
+            spacing: sport.theme.space2
+            Repeater {
+                model: 18
+                Rectangle {
+                    required property int index
+                    width: (sport.width - 17 * sport.theme.space2) / 18
+                    height: index >= 15 ? 16 * sport.theme.scale
+                                        : 10 * sport.theme.scale
+                    radius: height / 2
+                    color: index / 18 <= sport.telemetry.rpm / 10000
+                        ? (index >= 15 ? sport.theme.performance : sport.theme.accent)
+                        : sport.theme.surfaceRaised
+                }
+            }
+        }
+
         RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            RxGauge {
+            spacing: sport.theme.space8
+            RxHeroNumber {
                 Layout.fillWidth: true
-                Layout.fillHeight: true
-                theme: performance.theme
-                label: "ENGINE SPEED · PERFORMANCE"
-                unit: "rpm"
-                value: performance.telemetry.rpm
-                maximum: 10000
-                available: performance.live
-                accentColor: performance.telemetry.rpm > 8000 ? performance.theme.caution : performance.theme.accent
+                theme: sport.theme
+                value: sport.live ? Math.round(
+                    sport.formatter.speedValue(sport.telemetry.speedKph)).toString() : "—"
+                unit: sport.formatter.speedUnit
+                label: "Speed"
+                accentColor: sport.theme.textTertiary
             }
-            RxMetric { theme: performance.theme; label: "SPEED"; value: performance.formatter.speed(performance.telemetry.speedKph); available: performance.live }
-            RxMetric { theme: performance.theme; label: "GEAR"; value: performance.telemetry.gear; available: performance.live }
+            Column {
+                Layout.alignment: Qt.AlignCenter
+                spacing: -sport.theme.space4
+                RxText {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    theme: sport.theme
+                    text: sport.live ? sport.telemetry.gear : "—"
+                    font.pixelSize: sport.theme.textInstrument
+                    font.weight: Font.Light
+                }
+                RxText {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    theme: sport.theme
+                    text: "GEAR"
+                    color: sport.theme.performance
+                    font.pixelSize: sport.theme.textMicro
+                    font.bold: true
+                    font.letterSpacing: 2 * sport.theme.scale
+                }
+            }
+            RxHeroNumber {
+                Layout.fillWidth: true
+                theme: sport.theme
+                value: sport.live ? Math.round(sport.telemetry.rpm).toString() : "—"
+                unit: "rpm"
+                label: "Engine speed"
+                accentColor: sport.theme.performance
+            }
         }
-        GridLayout {
+
+        RowLayout {
             Layout.fillWidth: true
-            columns: 5
-            columnSpacing: performance.theme.space3
-            RxMetric { Layout.fillWidth: true; theme: performance.theme; label: "THROTTLE"; value: Math.round(performance.telemetry.throttlePercent); unit: "%"; available: performance.live }
-            RxMetric { Layout.fillWidth: true; theme: performance.theme; label: "OIL PRESS"; value: performance.formatter.pressure(performance.telemetry.oilPressureKpa); available: performance.live }
-            RxMetric { Layout.fillWidth: true; theme: performance.theme; label: "OIL TEMP"; value: performance.formatter.temperature(performance.telemetry.oilTempC); available: performance.live }
-            RxMetric { Layout.fillWidth: true; theme: performance.theme; label: "COOLANT"; value: performance.formatter.temperature(performance.telemetry.coolantTempC); available: performance.live }
-            RxMetric { Layout.fillWidth: true; theme: performance.theme; label: "BATTERY"; value: performance.formatter.voltage(performance.telemetry.batteryVoltage); available: performance.live }
+            spacing: sport.theme.space6
+            Repeater {
+                model: [
+                    ["THROTTLE", sport.live ? Math.round(sport.telemetry.throttlePercent) + "%" : "—"],
+                    ["OIL PRESSURE", sport.live ? sport.formatter.pressure(sport.telemetry.oilPressureKpa) : "—"],
+                    ["OIL TEMP", sport.live ? sport.formatter.temperature(sport.telemetry.oilTempC) : "—"],
+                    ["COOLANT", sport.live ? sport.formatter.temperature(sport.telemetry.coolantTempC) : "—"]
+                ]
+                delegate: ColumnLayout {
+                    id: metric
+                    required property var modelData
+                    Layout.fillWidth: true
+                    spacing: sport.theme.space1
+                    RxText {
+                        Layout.alignment: Qt.AlignHCenter
+                        theme: sport.theme
+                        text: metric.modelData[1]
+                        font.pixelSize: sport.theme.textTitle
+                        font.weight: Font.DemiBold
+                    }
+                    RxText {
+                        Layout.alignment: Qt.AlignHCenter
+                        theme: sport.theme
+                        text: metric.modelData[0]
+                        color: sport.theme.textTertiary
+                        font.pixelSize: sport.theme.textMicro
+                        font.letterSpacing: 1.2 * sport.theme.scale
+                    }
+                }
+            }
         }
     }
 }

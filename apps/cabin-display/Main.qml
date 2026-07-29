@@ -127,6 +127,9 @@ ApplicationWindow {
         + (performanceLoader.item ? 1 : 0)
         + (diagnosticsLoader.item ? 1 : 0)
         + (settingsLoader.item ? 1 : 0)
+        + (climateLoader.item ? 1 : 0)
+        + (camerasLoader.item ? 1 : 0)
+        + (serviceLoader.item ? 1 : 0)
     readonly property int hiddenWorkCount: Math.max(0, loadedPageCount - 1)
     property int profileEventSequence: 0
     property string profileEventName: "qml-ready"
@@ -137,13 +140,16 @@ ApplicationWindow {
     readonly property string requestedProfileScenario: profile.option("--profile-scenario") || "home"
     readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
     readonly property var applications: [
-        strings.home,
-        strings.navigation,
-        strings.media,
-        strings.vehicle,
-        strings.performance,
-        strings.diagnostics,
-        strings.settings
+        qsTr("Home"),
+        qsTr("Navigation"),
+        qsTr("Media"),
+        qsTr("Vehicle"),
+        qsTr("Vehicle Health"),
+        qsTr("Diagnostics"),
+        qsTr("Settings"),
+        qsTr("Climate"),
+        qsTr("Cameras"),
+        qsTr("Service")
     ]
     NavigationState { id: navigation; destinationCount: window.applications.length }
     readonly property int currentApplication: navigation.currentIndex
@@ -223,8 +229,8 @@ ApplicationWindow {
 
         Rectangle {
             Layout.fillWidth: true
-            Layout.preferredHeight: 96 * theme.scale
-            color: theme.surface
+            Layout.preferredHeight: 82 * theme.scale
+            color: theme.background
             RowLayout {
                 anchors.fill: parent
                 anchors.leftMargin: theme.safeMargin
@@ -234,12 +240,25 @@ ApplicationWindow {
                 RxIconButton { theme: window.theme; iconText: "⌂"; onClicked: window.goHome() }
                 RxText {
                     theme: window.theme
-                    text: window.applications[window.currentApplication]
-                    font.pixelSize: theme.textTitle
-                    font.bold: true
+                    text: "RXOS"
+                    font.pixelSize: theme.textLabel
+                    font.weight: Font.DemiBold
+                    font.letterSpacing: 1.7 * theme.scale
                 }
                 Item { Layout.fillWidth: true }
-                RxText { theme: window.theme; text: strings.simulatedSecondary; color: theme.textSecondary; font.pixelSize: theme.textCaption }
+                RxText {
+                    theme: window.theme
+                    text: window.applications[window.currentApplication].toUpperCase()
+                    color: theme.textSecondary
+                    font.pixelSize: theme.textMicro
+                    font.letterSpacing: 1.3 * theme.scale
+                }
+                RxText {
+                    theme: window.theme
+                    text: strings.simulatedSecondary.toUpperCase()
+                    color: theme.textTertiary
+                    font.pixelSize: theme.textMicro
+                }
                 RxStatusChip {
                     theme: window.theme
                     text: telemetry.status
@@ -266,7 +285,7 @@ ApplicationWindow {
             Loader {
                 id: navigationLoader
                 active: window.currentApplication === 1
-                sourceComponent: CabinPlaceholder {
+                sourceComponent: CabinNavigation {
                     theme: window.theme
                     title: strings.navigation
                     message: qsTr("Map rendering and route guidance are unavailable in this milestone.")
@@ -276,7 +295,7 @@ ApplicationWindow {
             Loader {
                 id: mediaLoader
                 active: window.currentApplication === 2
-                sourceComponent: CabinPlaceholder {
+                sourceComponent: CabinMedia {
                     theme: window.theme
                     title: strings.media
                     message: qsTr("No media provider is connected. Playback controls are visual placeholders.")
@@ -317,13 +336,41 @@ ApplicationWindow {
                     settings: window.appSettings
                 }
             }
+            Loader {
+                id: climateLoader
+                active: window.currentApplication === 7
+                sourceComponent: CabinPlaceholder {
+                    theme: window.theme
+                    title: qsTr("Climate")
+                    message: qsTr("Climate integration is unavailable. RXOS cannot control vehicle systems.")
+                }
+            }
+            Loader {
+                id: camerasLoader
+                active: window.currentApplication === 8
+                sourceComponent: CabinPlaceholder {
+                    theme: window.theme
+                    title: qsTr("Cameras")
+                    message: qsTr("No camera providers are connected in this milestone.")
+                    symbol: "◇"
+                }
+            }
+            Loader {
+                id: serviceLoader
+                active: window.currentApplication === 9
+                sourceComponent: CabinPlaceholder {
+                    theme: window.theme
+                    title: qsTr("Service")
+                    message: qsTr("Maintenance history and service intervals are unavailable.")
+                }
+            }
         }
 
         RxNavigationRail {
             Layout.fillWidth: true
-            Layout.preferredHeight: 108 * theme.scale
-            Layout.leftMargin: theme.space4
-            Layout.rightMargin: theme.space4
+            Layout.preferredHeight: 92 * theme.scale
+            Layout.leftMargin: theme.safeMargin
+            Layout.rightMargin: theme.safeMargin
             Layout.bottomMargin: theme.space4
             theme: window.theme
             destinations: window.applications

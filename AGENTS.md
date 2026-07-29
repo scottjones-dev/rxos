@@ -63,6 +63,12 @@ review gate in `docs/safety/safety-boundaries.md`.
   presentation formatter.
 - Visual baselines require human review. Never regenerate them merely to make
   a failing comparison green.
+- Milestone 1.6 uses typography-led, dark, edge-to-edge compositions. Preserve
+  the semantic colour roles and presentation rules in `docs/ui/design-system.md`.
+- Reference imagery may guide hierarchy and atmosphere but must not contribute
+  copied assets, logos, trade dress, or vehicle-control affordances.
+- Desktop-preview controls are local presentation values only. They must never
+  become a second telemetry provider or bypass contract validation.
 
 ## Commands
 
@@ -110,6 +116,8 @@ pnpm qt:lint
 pnpm qt:build
 pnpm qt:build:release
 pnpm qt:test
+pnpm preview:desktop
+pnpm preview:desktop:windows
 
 pnpm verify
 pnpm verify:milestone-1.3
@@ -127,6 +135,7 @@ pnpm prototype:diagnostics
 pnpm prototype:verify:software
 pnpm prototype:verify:hardware
 pnpm verify:milestone-1.5
+pnpm verify:milestone-1.6
 ```
 
 Run the TypeScript simulator with
@@ -191,3 +200,6 @@ rxos-vehicle-gateway`, with the same playback flag.
     collect personal files, tokens, unrelated logs or biometric touch data.
 29. Separate offscreen, Xvfb, X11 and Wayland/GPU evidence. Milestone 1.5 cannot
     be declared complete until representative physical reviews are recorded.
+30. Treat reference UI images as mood and hierarchy input only. Use
+    repository-owned shapes, typography and icons; never copy branded assets
+    or imply unsupported vehicle controls.

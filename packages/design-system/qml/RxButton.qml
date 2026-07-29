@@ -11,19 +11,26 @@ Button {
     contentItem: RxText {
         theme: control.theme
         text: (control.iconText ? control.iconText + "  " : "") + control.text
-        color: control.enabled ? control.theme.textPrimary : control.theme.unavailable
+        color: !control.enabled ? control.theme.unavailable
+            : (control.highlighted ? control.theme.background : control.theme.textPrimary)
+        font.weight: control.highlighted ? Font.DemiBold : Font.Normal
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
     }
     background: Rectangle {
-        radius: control.theme.radiusMedium
-        color: control.down ? control.theme.surfaceRaised : control.theme.surface
-        border.color: control.highlighted ? control.theme.accent : control.theme.border
-        border.width: control.highlighted ? 2 : 1
+        radius: control.theme.radiusPill
+        color: control.highlighted
+            ? control.theme.accent
+            : (control.down ? control.theme.surfaceRaised : "transparent")
+        border.color: "transparent"
+        border.width: 0
+        scale: control.down ? 0.97 : 1
+        Behavior on scale {
+            NumberAnimation { duration: control.theme.motionFast }
+        }
         RxFocusRing {
             theme: control.theme
             focused: control.activeFocus
         }
     }
 }
-

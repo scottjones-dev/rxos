@@ -10,22 +10,32 @@ QtObject {
 
     readonly property bool day: themeName === "day"
     readonly property color background: day ? "#EDF2F5" : "#070A0F"
-    readonly property color surface: day ? "#FFFFFF" : "#101722"
-    readonly property color surfaceRaised: day ? "#E3EAF0" : "#172130"
+    readonly property color surface: day ? "#FFFFFF" : "#0D1118"
+    readonly property color surfaceRaised: day ? "#E3EAF0" : "#151B25"
+    readonly property color surfaceQuiet: day ? "#D8E1E8" : "#090D13"
+    readonly property color surfaceGlass: day ? "#E8FFFFFF" : "#D9141A23"
     readonly property color border: highContrast
         ? (day ? "#17212B" : "#DCE9F3")
         : (day ? "#B8C5CF" : "#263447")
     readonly property color textPrimary: day ? "#101820" : "#F4F7FB"
     readonly property color textSecondary: highContrast
         ? textPrimary
-        : (day ? "#52616D" : "#9AA9B8")
-    readonly property color accent: day ? "#006D87" : "#38D6FF"
+        : (day ? "#52616D" : "#98A1AE")
+    readonly property color textTertiary: highContrast
+        ? textSecondary
+        : (day ? "#71808C" : "#657080")
+    readonly property color accent: day ? "#005ED6" : "#4E8CFF"
+    readonly property color systemAccent: accent
+    readonly property color navigation: day ? "#006F57" : "#38E6A1"
+    readonly property color media: day ? "#7251B5" : "#B793FF"
+    readonly property color performance: day ? "#B00020" : "#FF4057"
     readonly property color positive: day ? "#08784F" : "#43E09D"
     readonly property color information: accent
     readonly property color advisory: day ? "#6A55C9" : "#A99AFF"
     readonly property color caution: day ? "#8A5600" : "#FFB020"
     readonly property color critical: day ? "#B00020" : "#FF4057"
     readonly property color unavailable: day ? "#6E7C87" : "#708090"
+    readonly property color shadow: day ? "#26000000" : "#90000000"
 
     readonly property int space1: Math.round(4 * scale)
     readonly property int space2: Math.round(8 * scale)
@@ -34,22 +44,32 @@ QtObject {
     readonly property int space5: Math.round(24 * scale)
     readonly property int space6: Math.round(32 * scale)
     readonly property int space7: Math.round(48 * scale)
+    readonly property int space8: Math.round(64 * scale)
+    readonly property int space9: Math.round(80 * scale)
     readonly property int radiusSmall: Math.round(8 * scale)
     readonly property int radiusMedium: Math.round(14 * scale)
     readonly property int radiusLarge: Math.round(22 * scale)
+    readonly property int radiusPanel: Math.round(28 * scale)
+    readonly property int radiusPill: Math.round(999 * scale)
     readonly property int iconSmall: Math.round(20 * scale)
     readonly property int iconMedium: Math.round(28 * scale)
     readonly property int iconLarge: Math.round(40 * scale)
     readonly property int touchTarget: Math.round(56 * scale)
     readonly property int safeMargin: Math.round(48 * scale)
     readonly property int textCaption: Math.round(14 * scale)
+    readonly property int textMicro: Math.round(12 * scale)
+    readonly property int textLabel: Math.round(16 * scale)
     readonly property int textBody: Math.round(18 * scale)
     readonly property int textTitle: Math.round(28 * scale)
+    readonly property int textHeading: Math.round(40 * scale)
     readonly property int textDisplay: Math.round(64 * scale)
+    readonly property int textHero: Math.round(104 * scale)
+    readonly property int textInstrument: Math.round(152 * scale)
     readonly property int motionImmediate: 0
     readonly property int motionFast: reducedMotion ? 0 : 100
     readonly property int motionStandard: reducedMotion ? 0 : 180
     readonly property int motionDeliberate: reducedMotion ? 0 : 280
+    readonly property int motionSettle: reducedMotion ? 0 : 420
 
     function severityColor(severity) {
         if (severity === "Critical") return critical
@@ -58,4 +78,3 @@ QtObject {
         return information
     }
 }
-

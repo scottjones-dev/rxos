@@ -11,58 +11,154 @@ Item {
     required property WarningModel warnings
     readonly property bool live: telemetry.status === "LIVE"
 
-    GridLayout {
+    ColumnLayout {
         anchors.fill: parent
         anchors.margins: home.theme.safeMargin
-        columns: 3
-        rowSpacing: home.theme.space4
-        columnSpacing: home.theme.space4
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            visible: home.settings.showNavigationWidget
-            theme: home.theme; heading: "Navigation"; subtitle: "Placeholder"
-            RxEmptyState { anchors.centerIn: parent; theme: home.theme; title: "Continue straight"; message: "450 m · simulated" }
+        spacing: home.theme.space5
+
+        RxPageHeader {
+            Layout.fillWidth: true
+            theme: home.theme
+            eyebrow: "RXOS"
+            title: "Welcome back"
+            detail: home.live ? "SIMULATED TELEMETRY CURRENT" : "VEHICLE DATA UNAVAILABLE"
         }
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            visible: home.settings.showMediaWidget
-            theme: home.theme; heading: "Media"; subtitle: "Placeholder"
-            RxEmptyState { anchors.centerIn: parent; theme: home.theme; title: "No media"; message: "Provider unavailable" }
-        }
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            visible: home.settings.showHealthWidget
-            theme: home.theme; heading: "Vehicle health"; subtitle: "Simulated telemetry"
-            Column {
-                anchors.centerIn: parent; spacing: home.theme.space3
-                RxStatusChip { anchors.horizontalCenter: parent.horizontalCenter; theme: home.theme; text: home.warnings.activeWarnings.length + " ACTIVE"; severity: home.warnings.mostSevere.severity }
-                RxText { theme: home.theme; text: home.live ? "Telemetry current" : "Values unavailable"; color: home.theme.textSecondary }
+
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            spacing: home.theme.space5
+
+            RxCard {
+                Layout.preferredWidth: parent.width * 0.58
+                Layout.fillHeight: true
+                theme: home.theme
+                heading: "Where to?"
+                subtitle: "Navigation preview · routing unavailable"
+                accentColor: home.theme.navigation
+
+                Item {
+                    anchors.fill: parent
+                    Rectangle {
+                        anchors.fill: parent
+                        color: home.theme.surfaceQuiet
+                        radius: home.theme.radiusLarge
+                        opacity: 0.75
+                    }
+                    Canvas {
+                        anchors.fill: parent
+                        opacity: 0.38
+                        onPaint: {
+                            const context = getContext("2d")
+                            context.strokeStyle = home.theme.textTertiary
+                            context.lineWidth = 2
+                            const lines = [[0,.22,1,.55],[.08,1,.46,0],
+                                [.62,1,.7,0],[0,.72,1,.35]]
+                            for (let line of lines) {
+                                context.beginPath()
+                                context.moveTo(width * line[0], height * line[1])
+                                context.lineTo(width * line[2], height * line[3])
+                                context.stroke()
+                            }
+                        }
+                    }
+                    Column {
+                        anchors.left: parent.left
+                        anchors.bottom: parent.bottom
+                        anchors.margins: home.theme.space6
+                        spacing: home.theme.space2
+                        RxText {
+                            theme: home.theme
+                            text: "↑  Continue straight"
+                            font.pixelSize: home.theme.textTitle
+                            font.weight: Font.DemiBold
+                        }
+                        RxText {
+                            theme: home.theme
+                            text: "450 m · GUIDANCE PREVIEW"
+                            color: home.theme.navigation
+                            font.pixelSize: home.theme.textMicro
+                            font.bold: true
+                            font.letterSpacing: 1.2 * home.theme.scale
+                        }
+                    }
+                }
             }
-        }
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            visible: home.settings.showTripWidget
-            theme: home.theme; heading: "Recent trip"; subtitle: "Placeholder"
-            RxEmptyState { anchors.centerIn: parent; theme: home.theme; title: "No trip data"; message: "Trip storage is outside milestone 1.2" }
-        }
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            theme: home.theme; heading: "Fuel and range"; subtitle: "Range is a simulated estimate"
-            Column {
-                anchors.centerIn: parent; spacing: home.theme.space3
-                RxText { anchors.horizontalCenter: parent.horizontalCenter; theme: home.theme; text: home.live ? home.formatter.fuel(home.telemetry.fuelPercent) : "—"; font.pixelSize: home.theme.textTitle; font.bold: true }
-                RxText { anchors.horizontalCenter: parent.horizontalCenter; theme: home.theme; text: home.live ? "EST. " + home.formatter.distance(home.telemetry.fuelPercent * 3.2) : "UNAVAILABLE"; color: home.theme.textSecondary }
-            }
-        }
-        RxCard {
-            Layout.fillWidth: true; Layout.fillHeight: true
-            theme: home.theme; heading: "Current telemetry"; subtitle: home.telemetry.status
-            Grid {
-                anchors.centerIn: parent; columns: 2; spacing: home.theme.space4
-                RxText { theme: home.theme; text: home.live ? home.formatter.speed(home.telemetry.speedKph) : "—"; font.bold: true }
-                RxText { theme: home.theme; text: home.live ? Math.round(home.telemetry.rpm) + " rpm" : "—"; font.bold: true }
-                RxText { theme: home.theme; text: home.live ? "Gear " + home.telemetry.gear : "Gear —"; font.bold: true }
-                RxText { theme: home.theme; text: home.live ? home.formatter.temperature(home.telemetry.coolantTempC) : "—"; font.bold: true }
+
+            ColumnLayout {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                spacing: home.theme.space5
+                RxCard {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    theme: home.theme
+                    heading: "Now playing"
+                    subtitle: "No media provider connected"
+                    accentColor: home.theme.media
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: home.theme.space4
+                        Rectangle {
+                            width: 92 * home.theme.scale
+                            height: width
+                            radius: home.theme.radiusMedium
+                            color: home.theme.surfaceRaised
+                            RxText {
+                                anchors.centerIn: parent
+                                theme: home.theme
+                                text: "♪"
+                                color: home.theme.media
+                                font.pixelSize: home.theme.textHeading
+                            }
+                        }
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            spacing: home.theme.space2
+                            RxText {
+                                theme: home.theme
+                                text: "Media unavailable"
+                                font.pixelSize: home.theme.textTitle
+                                font.weight: Font.DemiBold
+                            }
+                            RxText {
+                                theme: home.theme
+                                text: "Playback controls are a visual preview"
+                                color: home.theme.textSecondary
+                            }
+                        }
+                    }
+                }
+                RxCard {
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: 150 * home.theme.scale
+                    theme: home.theme
+                    heading: "Your RX-8"
+                    subtitle: home.live
+                        ? (home.warnings.activeWarnings.length === 0
+                            ? "No simulated alerts" : home.warnings.activeWarnings.length + " simulated alerts")
+                        : "Status unavailable"
+                    accentColor: home.warnings.activeWarnings.length > 0
+                        ? home.theme.caution : home.theme.navigation
+                    RowLayout {
+                        anchors.fill: parent
+                        RxText {
+                            theme: home.theme
+                            text: home.live ? home.formatter.fuel(
+                                home.telemetry.fuelPercent) : "—"
+                            font.pixelSize: home.theme.textTitle
+                            font.weight: Font.DemiBold
+                        }
+                        Item { Layout.fillWidth: true }
+                        RxText {
+                            theme: home.theme
+                            text: home.live ? home.formatter.temperature(
+                                home.telemetry.oilTempC) : "—"
+                            color: home.theme.textSecondary
+                            font.pixelSize: home.theme.textTitle
+                        }
+                    }
+                }
             }
         }
     }

@@ -6,6 +6,9 @@ Item {
     required property RxTokens theme
     property string title: ""
     property string message: ""
+    property var telemetry
+    property var formatter
+    property var history
     property string symbol: "—"
     RxEmptyState {
         anchors.centerIn: parent

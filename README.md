@@ -2,7 +2,8 @@
 
 RXOS is an experimental dual-screen infotainment and instrument-cluster
 platform for a Mazda RX-8. This repository currently contains a desktop
-simulator and milestone 1.5 representative-hardware qualification tooling.
+simulator, milestone 1.5 representative-hardware qualification tooling, and
+the milestone 1.6 presentation redesign.
 
 > RXOS is read-only and is not a certified vehicle instrument. Milestone one
 > must not be connected to a vehicle or used to control any vehicle system.
@@ -16,10 +17,12 @@ simulator and milestone 1.5 representative-hardware qualification tooling.
 - Rust and TypeScript simulator/gateway implementations using the same JSON
   contract.
 - Recorded NDJSON playback.
-- Qt/QML driver display with Daily, Performance, Track, and reduced-data
-  presentation.
-- Qt/QML cabin shell with Home, Navigation, Media, Vehicle, Performance,
-  Diagnostics, and Settings applications.
+- Qt/QML driver display with Road, Sport, Track, and reduced-data presentation
+  (legacy scenario names remain Daily and Performance).
+- Qt/QML cabin shell with Home, Navigation, Media, Vehicle, Climate, Cameras,
+  Settings, Vehicle Health, Service, and Diagnostics applications.
+- A resizable desktop design preview showing both display concepts and local
+  presentation controls without opening a vehicle or telemetry connection.
 - Shared day/night design tokens, reusable controls, configurable logical
   profiles, keyboard/rotary-style focus support, and bounded telemetry charts.
 - Browser developer console for inspecting the stream.
@@ -103,6 +106,20 @@ pnpm prototype:diagnostics
 pnpm prototype:verify:software
 ```
 
+Milestone 1.6 presentation commands:
+
+```bash
+pnpm qt:configure
+pnpm qt:build
+pnpm preview:desktop        # Linux
+pnpm preview:desktop:windows
+pnpm visual:verify
+pnpm verify:milestone-1.6
+```
+
+The desktop preview controls local display values only. It is not a simulator,
+telemetry provider, or vehicle interface.
+
 `prototype:dev`, `prototype:fullscreen`, `prototype:review`, and
 `prototype:verify:hardware` require a native release build and appropriately
 configured Linux displays. They do not connect to a vehicle. Milestone 1.5
@@ -125,6 +142,7 @@ and `--density`.
 
 - `apps/driver-display`: driver Qt/QML display.
 - `apps/cabin-display`: centre cabin Qt/QML display.
+- `apps/desktop-preview`: resizable presentation-only development preview.
 - `apps/vehicle-simulator`: TypeScript reference simulator.
 - `apps/developer-console`: browser telemetry inspector.
 - `services/vehicle-gateway`: Rust simulation/playback gateway.

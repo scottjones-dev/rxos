@@ -6,8 +6,19 @@ Column {
     property string title: "Nothing to show"
     property string message: ""
     spacing: theme.space3
-    RxIcon { anchors.horizontalCenter: parent.horizontalCenter; theme: empty.theme; symbol: "—" }
-    RxText { anchors.horizontalCenter: parent.horizontalCenter; theme: empty.theme; text: empty.title; font.bold: true }
-    RxText { anchors.horizontalCenter: parent.horizontalCenter; theme: empty.theme; text: empty.message; color: empty.theme.textSecondary }
-}
 
+    RxText {
+        anchors.horizontalCenter: parent.horizontalCenter
+        theme: empty.theme
+        text: empty.title
+        font.pixelSize: empty.theme.textTitle
+        font.weight: Font.DemiBold
+    }
+    RxText {
+        anchors.horizontalCenter: parent.horizontalCenter
+        theme: empty.theme
+        text: empty.message
+        color: empty.theme.textSecondary
+        font.pixelSize: empty.theme.textLabel
+    }
+}

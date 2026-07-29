@@ -15,9 +15,10 @@ RxCard {
         RxText {
             theme: metric.theme
             text: metric.label.toUpperCase()
-            color: metric.theme.textSecondary
-            font.pixelSize: metric.theme.textCaption
+            color: metric.theme.textTertiary
+            font.pixelSize: metric.theme.textMicro
             font.bold: true
+            font.letterSpacing: 1.2 * metric.theme.scale
         }
         Row {
             spacing: metric.theme.space2
@@ -26,7 +27,7 @@ RxCard {
                 text: metric.available ? metric.value : "—"
                 color: metric.available ? metric.valueColor : metric.theme.unavailable
                 font.pixelSize: metric.theme.textTitle
-                font.bold: true
+                font.weight: Font.DemiBold
             }
             RxText {
                 theme: metric.theme
@@ -38,4 +39,3 @@ RxCard {
         }
     }
 }
-

@@ -260,6 +260,25 @@ Run the complete repository sequence with:
 pnpm verify
 ```
 
+## Desktop design preview
+
+After configuring and building Qt, launch the resizable milestone 1.6 preview:
+
+```bash
+pnpm preview:desktop
+```
+
+On Windows PowerShell use:
+
+```powershell
+pnpm preview:desktop:windows
+```
+
+The window presents a driver concept, a cabin concept, and local speed, RPM,
+and mode controls. These controls affect only the preview process. The preview
+does not listen on a telemetry port, publish telemetry, connect to SocketCAN,
+or control a vehicle.
+
 `qt:test` runs:
 
 - deterministic QML state tests;

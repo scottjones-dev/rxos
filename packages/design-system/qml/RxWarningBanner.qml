@@ -7,10 +7,10 @@ Rectangle {
     property string title: ""
     property string message: ""
     implicitHeight: 82 * theme.scale
-    radius: theme.radiusMedium
-    color: Qt.alpha(theme.severityColor(severity), 0.18)
-    border.color: theme.severityColor(severity)
-    border.width: severity === "Critical" ? 3 : 1
+    radius: theme.radiusLarge
+    color: Qt.alpha(theme.severityColor(severity), 0.22)
+    border.color: "transparent"
+    border.width: 0
     Row {
         anchors.fill: parent
         anchors.margins: banner.theme.space4
@@ -26,7 +26,7 @@ Rectangle {
                 theme: banner.theme
                 text: banner.severity.toUpperCase() + " · " + banner.title
                 color: banner.theme.severityColor(banner.severity)
-                font.bold: true
+                font.weight: Font.DemiBold
             }
             RxText {
                 width: parent.width
@@ -37,4 +37,3 @@ Rectangle {
         }
     }
 }
-

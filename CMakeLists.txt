@@ -5,6 +5,7 @@ enable_testing()
 add_subdirectory(packages/design-system)
 add_subdirectory(apps/driver-display)
 add_subdirectory(apps/cabin-display)
+add_subdirectory(apps/desktop-preview)
 
 find_program(QMLTESTRUNNER_EXECUTABLE qmltestrunner REQUIRED)
 find_program(NODE_EXECUTABLE node REQUIRED)
@@ -46,6 +47,10 @@ add_test(
     COMMAND "$<TARGET_FILE:rxos-cabin-display>"
         --smoke-test --width 1920 --height 1080 --scale 1.0 --density 170
 )
+add_test(
+    NAME desktop-preview-smoke
+    COMMAND "$<TARGET_FILE:rxos-desktop-preview>" --smoke-test
+)
 
 set_tests_properties(
     qml-telemetry-state
@@ -54,6 +59,7 @@ set_tests_properties(
     concurrent-display-reliability
     driver-display-profile
     cabin-display-profile
+    desktop-preview-smoke
     PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QSG_RHI_BACKEND=software"
         RUN_SERIAL TRUE

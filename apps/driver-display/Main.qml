@@ -92,6 +92,8 @@ ApplicationWindow {
         warningModel.activeWarnings.map(item => item.identifier).join(",")
     onProfileWarningSignatureChanged: markProfileEvent("warning-overlay")
     readonly property string currentMode: settings.driverMode
+    readonly property string currentModeLabel: currentMode === "Daily"
+        ? "ROAD" : (currentMode === "Performance" ? "SPORT" : "TRACK")
     VisualScenario {
         id: visualScenario
         telemetry: telemetry
@@ -152,30 +154,27 @@ ApplicationWindow {
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: theme.safeMargin
-        spacing: theme.space4
+        spacing: theme.space5
 
         RowLayout {
             Layout.fillWidth: true
-            Layout.preferredHeight: 44 * theme.scale
+            Layout.preferredHeight: 40 * theme.scale
             spacing: theme.space4
             RxText {
                 theme: window.theme
-                text: "RXOS"
-                color: theme.accent
-                font.pixelSize: theme.textTitle
-                font.bold: true
-            }
-            RxStatusChip {
-                theme: window.theme
-                text: window.currentMode.toUpperCase()
-                severity: "Information"
+                text: "RXOS  /  " + window.currentModeLabel
+                color: theme.textPrimary
+                font.pixelSize: theme.textLabel
+                font.weight: Font.DemiBold
+                font.letterSpacing: 1.8 * theme.scale
             }
             Item { Layout.fillWidth: true }
             RxText {
                 theme: window.theme
-                text: strings.simulatedSecondary
-                color: theme.textSecondary
-                font.pixelSize: theme.textCaption
+                text: strings.simulatedSecondary.toUpperCase()
+                color: theme.textTertiary
+                font.pixelSize: theme.textMicro
+                font.letterSpacing: 1.3 * theme.scale
             }
             RxStatusChip {
                 theme: window.theme

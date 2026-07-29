@@ -9,57 +9,122 @@ Item {
     required property PresentationFormatter formatter
     required property bool live
 
-    RowLayout {
+    ColumnLayout {
         anchors.fill: parent
-        spacing: track.theme.space5
-        ColumnLayout {
-            Layout.preferredWidth: parent.width * 0.58
-            Layout.fillHeight: true
-            RxGauge {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                theme: track.theme
-                label: "RPM · SHIFT PRESENTATION"
-                unit: "rpm"
-                value: track.telemetry.rpm
-                maximum: 10000
-                available: track.live
-                accentColor: track.telemetry.rpm > 8000 ? track.theme.caution : track.theme.accent
-            }
-            RowLayout {
-                RxMetric { Layout.fillWidth: true; theme: track.theme; label: "SPEED"; value: track.formatter.speed(track.telemetry.speedKph); available: track.live }
-                RxMetric { Layout.fillWidth: true; theme: track.theme; label: "GEAR"; value: track.telemetry.gear; available: track.live }
-                RxMetric { Layout.fillWidth: true; theme: track.theme; label: "THROTTLE"; value: Math.round(track.telemetry.throttlePercent); unit: "%"; available: track.live }
+        spacing: track.theme.space4
+
+        Row {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 22 * track.theme.scale
+            spacing: track.theme.space2
+            Repeater {
+                model: 14
+                Rectangle {
+                    required property int index
+                    width: (track.width - 13 * track.theme.space2) / 14
+                    height: 12 * track.theme.scale
+                    radius: height / 2
+                    color: index / 14 <= track.telemetry.rpm / 10000
+                        ? (index >= 11 ? track.theme.performance : track.theme.navigation)
+                        : track.theme.surfaceRaised
+                }
             }
         }
-        GridLayout {
+
+        RowLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            columns: 2
-            rowSpacing: track.theme.space3
-            columnSpacing: track.theme.space3
-            Repeater {
-                model: [
-                    ["LAP", "—", "UNAVAILABLE"],
-                    ["PREVIOUS", "—", "UNAVAILABLE"],
-                    ["BEST", "—", "UNAVAILABLE"],
-                    ["DELTA", "—", "UNAVAILABLE"],
-                    ["OIL PRESS", Math.round(track.telemetry.oilPressureKpa), "kPa"],
-                    ["OIL TEMP", Math.round(track.telemetry.oilTempC), "°C"],
-                    ["COOLANT", Math.round(track.telemetry.coolantTempC), "°C"]
-                ]
-                delegate: RxMetric {
-                    id: trackMetric
-                    required property var modelData
-                    required property int index
+            spacing: track.theme.space8
+
+            ColumnLayout {
+                Layout.preferredWidth: parent.width * 0.24
+                spacing: track.theme.space5
+                RxHeroNumber {
                     Layout.fillWidth: true
-                    Layout.fillHeight: true
                     theme: track.theme
-                    label: trackMetric.modelData[0]
-                    value: trackMetric.modelData[1]
-                    unit: trackMetric.modelData[2]
-                    available: trackMetric.index < 4 ? false : track.live
+                    value: track.live ? Math.round(track.formatter.speedValue(
+                        track.telemetry.speedKph)).toString() : "—"
+                    unit: track.formatter.speedUnit
+                    label: "Speed"
+                    accentColor: track.theme.textTertiary
                 }
+                RxHeroNumber {
+                    Layout.fillWidth: true
+                    theme: track.theme
+                    value: "—"
+                    unit: ""
+                    label: "Lap unavailable"
+                    accentColor: track.theme.unavailable
+                }
+            }
+
+            Column {
+                Layout.alignment: Qt.AlignCenter
+                spacing: -track.theme.space6
+                RxText {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    theme: track.theme
+                    text: track.live ? track.telemetry.gear : "—"
+                    font.pixelSize: 250 * track.theme.scale
+                    font.weight: Font.Light
+                }
+                RxText {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    theme: track.theme
+                    text: "GEAR"
+                    color: track.theme.performance
+                    font.pixelSize: track.theme.textLabel
+                    font.bold: true
+                    font.letterSpacing: 2.5 * track.theme.scale
+                }
+            }
+
+            ColumnLayout {
+                Layout.preferredWidth: parent.width * 0.24
+                spacing: track.theme.space5
+                RxHeroNumber {
+                    Layout.fillWidth: true
+                    theme: track.theme
+                    value: track.live
+                        ? track.formatter.temperature(track.telemetry.oilTempC) : "—"
+                    unit: ""
+                    label: "Oil temperature"
+                    accentColor: track.theme.caution
+                }
+                RxHeroNumber {
+                    Layout.fillWidth: true
+                    theme: track.theme
+                    value: track.live
+                        ? track.formatter.temperature(track.telemetry.coolantTempC) : "—"
+                    unit: ""
+                    label: "Coolant"
+                    accentColor: track.theme.caution
+                }
+            }
+        }
+
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+            spacing: track.theme.space8
+            RxText {
+                theme: track.theme
+                text: track.live ? Math.round(track.telemetry.rpm) + " rpm" : "—"
+                color: track.theme.textSecondary
+                font.pixelSize: track.theme.textLabel
+            }
+            RxText {
+                theme: track.theme
+                text: track.live
+                    ? track.formatter.pressure(track.telemetry.oilPressureKpa) : "—"
+                color: track.theme.textSecondary
+                font.pixelSize: track.theme.textLabel
+            }
+            RxText {
+                theme: track.theme
+                text: "DELTA UNAVAILABLE"
+                color: track.theme.unavailable
+                font.pixelSize: track.theme.textMicro
+                font.letterSpacing: 1.4 * track.theme.scale
             }
         }
     }

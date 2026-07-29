@@ -7,8 +7,8 @@ Rectangle {
     property int currentIndex: 0
     property bool vertical: true
     signal activated(int index)
-    color: theme.surface
-    radius: theme.radiusLarge
+    color: theme.surfaceGlass
+    radius: theme.radiusPanel
     implicitWidth: vertical ? 112 * theme.scale : 700 * theme.scale
     implicitHeight: vertical ? 700 * theme.scale : 96 * theme.scale
 
@@ -25,7 +25,10 @@ Rectangle {
             required property var modelData
             required property int index
             theme: rail.theme
-            width: rail.vertical ? list.width : 112 * rail.theme.scale
+            width: rail.vertical ? list.width
+                : Math.max(100 * rail.theme.scale,
+                    (list.width - Math.max(0, list.count - 1) * list.spacing)
+                    / Math.max(1, list.count))
             height: rail.theme.touchTarget
             text: destinationButton.modelData
             highlighted: destinationButton.index === rail.currentIndex
@@ -34,4 +37,3 @@ Rectangle {
         }
     }
 }
-
