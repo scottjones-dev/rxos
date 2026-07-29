@@ -1,11 +1,14 @@
 import QtQuick
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 Item {
     id: performance
     required property RxTokens theme
     required property var telemetry
+    required property PresentationFormatter formatter
     readonly property bool live: telemetry.status === "LIVE"
+    readonly property int sampleCount: rpmHistory.length
     BoundedHistory { id: rpmHistory; capacity: 600; downsampleEvery: 1 }
     Connections {
         target: performance.telemetry.telemetryState
@@ -33,8 +36,15 @@ Item {
                     Layout.fillWidth: true
                     theme: performance.theme
                     label: performanceMetric.modelData[0]
-                    value: Math.round(performanceMetric.modelData[1])
-                    unit: performanceMetric.modelData[2]
+                    value: performanceMetric.modelData[0] === "OIL PRESS"
+                        ? performance.formatter.pressure(performanceMetric.modelData[1])
+                        : (performanceMetric.modelData[0] === "OIL TEMP"
+                            || performanceMetric.modelData[0] === "COOLANT"
+                            ? performance.formatter.temperature(performanceMetric.modelData[1])
+                            : Math.round(performanceMetric.modelData[1]))
+                    unit: performanceMetric.modelData[0] === "RPM"
+                        || performanceMetric.modelData[0] === "THROTTLE"
+                        ? performanceMetric.modelData[2] : ""
                     available: performance.live
                 }
             }
@@ -56,4 +66,3 @@ Item {
         }
     }
 }
-

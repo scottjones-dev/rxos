@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 Item {
     id: vehicle
@@ -45,4 +46,3 @@ Item {
         }
     }
 }
-

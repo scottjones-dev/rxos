@@ -1,12 +1,19 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 ApplicationWindow {
     id: window
 
     DisplayProfiles { id: profile; profile: "cabin" }
     DisplaySettings { id: settings }
+    RxStrings { id: strings; localeName: profile.option("--locale") || "en-GB" }
+    PresentationFormatter {
+        id: formatter
+        localeName: strings.localeName
+        unitsProfile: profile.option("--units") || "metric"
+    }
     RxTokens {
         id: visualTokens
         themeName: settings.resolvedTheme()
@@ -15,7 +22,11 @@ ApplicationWindow {
         scale: profile.scale * settings.displayScale
     }
     readonly property RxTokens theme: visualTokens
-    TelemetryStore { id: telemetry }
+    TelemetryStore {
+        id: telemetry
+        endpoint: profile.option("--telemetry-endpoint") || "ws://127.0.0.1:8787/telemetry"
+        acceptEvery: Number(profile.option("--accept-every") || 1)
+    }
     WarningModel {
         id: warningModel
         telemetryWarnings: telemetry.data.warnings
@@ -27,11 +38,37 @@ ApplicationWindow {
     visible: true
     color: theme.background
     title: "RXOS Cabin Display"
+    LayoutMirroring.enabled: strings.rightToLeft
+    LayoutMirroring.childrenInherit: true
     readonly property bool reliabilityComplete: telemetry.reliabilityComplete
-    readonly property var applications: ["Home", "Navigation", "Media", "Vehicle", "Performance", "Diagnostics", "Settings"]
+    readonly property int acceptedMessages: telemetry.acceptedMessages
+    readonly property int receivedMessages: telemetry.receivedMessages
+    readonly property int laggedMessages: telemetry.laggedMessages
+    readonly property double lastSequence: telemetry.lastSequence
+    readonly property int chartSampleCount: performancePage.sampleCount
+    readonly property string requestedScenario: profile.option("--visual-scenario") || ""
+    readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
+    readonly property var applications: [
+        strings.home,
+        strings.navigation,
+        strings.media,
+        strings.vehicle,
+        strings.performance,
+        strings.diagnostics,
+        strings.settings
+    ]
     NavigationState { id: navigation; destinationCount: window.applications.length }
     readonly property int currentApplication: navigation.currentIndex
     readonly property var navigationHistory: navigation.history
+    VisualScenario {
+        id: visualScenario
+        telemetry: telemetry
+        settings: settings
+        navigation: navigation
+        active: window.requestedScenario.length > 0
+        scenario: window.requestedScenario || "home"
+        driver: false
+    }
 
     function navigate(index) {
         navigation.navigate(index)
@@ -71,7 +108,7 @@ ApplicationWindow {
                     font.bold: true
                 }
                 Item { Layout.fillWidth: true }
-                RxText { theme: window.theme; text: "SIMULATED · READ ONLY"; color: theme.textSecondary; font.pixelSize: theme.textCaption }
+                RxText { theme: window.theme; text: strings.simulatedSecondary; color: theme.textSecondary; font.pixelSize: theme.textCaption }
                 RxStatusChip {
                     theme: window.theme
                     text: telemetry.status
@@ -84,11 +121,11 @@ ApplicationWindow {
             currentIndex: window.currentApplication
             Layout.fillWidth: true
             Layout.fillHeight: true
-            CabinHome { theme: window.theme; telemetry: telemetry; settings: settings; warnings: warningModel }
-            CabinPlaceholder { theme: window.theme; title: "Navigation"; message: "Map rendering and route guidance are unavailable in this milestone."; symbol: "↑" }
-            CabinPlaceholder { theme: window.theme; title: "Media"; message: "No media provider is connected. Playback controls are visual placeholders."; symbol: "♪" }
+            CabinHome { theme: window.theme; telemetry: telemetry; formatter: formatter; settings: settings; warnings: warningModel }
+            CabinPlaceholder { theme: window.theme; title: strings.navigation; message: qsTr("Map rendering and route guidance are unavailable in this milestone."); symbol: "↑" }
+            CabinPlaceholder { theme: window.theme; title: strings.media; message: qsTr("No media provider is connected. Playback controls are visual placeholders."); symbol: "♪" }
             CabinVehicle { theme: window.theme; telemetry: telemetry }
-            CabinPerformance { theme: window.theme; telemetry: telemetry }
+            CabinPerformance { id: performancePage; theme: window.theme; telemetry: telemetry; formatter: formatter }
             CabinDiagnostics { theme: window.theme; telemetry: telemetry }
             CabinSettings { theme: window.theme; settings: settings }
         }

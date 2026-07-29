@@ -3,6 +3,10 @@
 These observations are development evidence, not target-hardware results,
 real-time guarantees, or automotive-grade certification.
 
+Milestone 1.3 adds concurrent native RSS observations and CI artifacts; see
+[`milestone-1.3.md`](milestone-1.3.md). The virtual benchmark below remains
+useful for schema and bounded-history processing only.
+
 ## Deterministic host benchmark
 
 On the Windows development host on 2026-07-29:

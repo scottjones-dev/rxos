@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 Item {
     id: daily
     required property RxTokens theme
     required property var telemetry
+    required property PresentationFormatter formatter
     required property bool live
 
     RowLayout {
@@ -35,8 +37,8 @@ Item {
                     Layout.fillWidth: true
                     theme: daily.theme
                     label: "SPEED"
-                    unit: "km/h"
-                    value: daily.telemetry.speedKph
+                    unit: ""
+                    value: daily.formatter.speed(daily.telemetry.speedKph, daily.live ? "live" : "missing")
                     maximum: 300
                     available: daily.live
                 }
@@ -77,8 +79,12 @@ Item {
                         Layout.fillWidth: true
                         theme: daily.theme
                         label: dailyMetric.modelData[0]
-                        value: Number(dailyMetric.modelData[1]).toFixed(dailyMetric.modelData[0] === "BATTERY" ? 1 : 0)
-                        unit: dailyMetric.modelData[2]
+                        value: dailyMetric.modelData[0] === "FUEL"
+                            ? daily.formatter.fuel(dailyMetric.modelData[1])
+                            : (dailyMetric.modelData[0] === "BATTERY"
+                                ? daily.formatter.voltage(dailyMetric.modelData[1])
+                                : daily.formatter.temperature(dailyMetric.modelData[1]))
+                        unit: ""
                         available: daily.live
                     }
                 }
@@ -86,4 +92,3 @@ Item {
         }
     }
 }
-

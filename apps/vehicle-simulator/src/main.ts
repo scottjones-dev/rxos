@@ -184,23 +184,30 @@ export async function stopSimulator(server: WebSocketServer): Promise<void> {
 function parseArguments(argv: readonly string[]): {
   port: number;
   recordingPath?: string;
+  updateHz: number;
 } {
   const playbackIndex = argv.indexOf("--playback");
   const portIndex = argv.indexOf("--port");
+  const updateHzIndex = argv.indexOf("--hz");
   const recordingPath =
     playbackIndex >= 0 ? argv[playbackIndex + 1] : undefined;
   const rawPort = portIndex >= 0 ? argv[portIndex + 1] : undefined;
   const port = rawPort === undefined ? DEFAULT_PORT : Number(rawPort);
+  const updateHz =
+    updateHzIndex >= 0 ? Number(argv[updateHzIndex + 1]) : DEFAULT_UPDATE_HZ;
   if (!Number.isInteger(port) || port < 1 || port > 65_535) {
     throw new Error("--port must be between 1 and 65535");
   }
-  return { port, recordingPath };
+  intervalForHz(updateHz);
+  return { port, recordingPath, updateHz };
 }
 
 const entryPoint = process.argv[1];
 if (entryPoint && import.meta.url === new URL(entryPoint, "file:").href) {
   const options = parseArguments(process.argv.slice(2));
-  const server = await startSimulator(options.port, options.recordingPath);
+  const server = await startSimulator(options.port, options.recordingPath, {
+    updateHz: options.updateHz,
+  });
   const mode = options.recordingPath
     ? `playback: ${options.recordingPath}`
     : "deterministic simulation";

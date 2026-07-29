@@ -4,3 +4,4 @@ coverage
 target
 pnpm-lock.yaml
 *.ndjson
+packages/design-system/translations/*.ts

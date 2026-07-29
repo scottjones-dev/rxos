@@ -7,7 +7,7 @@
 - Rust stable (`rustup`, `rustc`, `cargo`, `rustfmt`, `clippy`)
 - CMake 3.21 or newer
 - Ninja
-- Qt 6.5 or newer with Quick, Quick Controls 2 and WebSockets modules
+- Qt 6.5 or newer with Quick, Quick Controls 2, WebSockets and Linguist Tools
 - Qt QML tooling, Qt Test, and Qt Quick Test
 
 Linux is the target platform. On Ubuntu-family development systems, use the
@@ -36,7 +36,7 @@ On Ubuntu 24.04, install the compiler and Qt runtime prerequisites:
 ```bash
 sudo apt-get update
 sudo apt-get install --yes \
-  build-essential cmake ninja-build \
+  build-essential cmake ninja-build fonts-noto-core \
   libgl1-mesa-dev libegl1-mesa-dev \
   libxkbcommon-dev libxkbcommon-x11-0
 ```
@@ -149,6 +149,26 @@ normal, high-RPM, warning, stale, disconnect, and recovery scenario.
 `pnpm performance:observe` runs the host-side virtual ten-minute 60 Hz
 processing and bounded-history observation. It is not a real-time benchmark.
 
+For the native milestone 1.3 workflow:
+
+```bash
+pnpm concurrent:launch
+pnpm concurrent:test
+pnpm localisation:validate
+pnpm layout:test
+pnpm visual:baseline
+pnpm visual:verify
+pnpm performance:native:short
+pnpm performance:native:extended
+pnpm verify:milestone-1.3
+```
+
+Baseline generation is an intentional review action: inspect the generated
+gallery before committing changed images. Native tools honour
+`RXOS_DRIVER_EXECUTABLE` and `RXOS_CABIN_EXECUTABLE` when a generator places
+binaries outside the default paths. Local screenshots can differ from Ubuntu
+CI font rasterisation and are not interchangeable with reviewed CI baselines.
+
 Run the complete repository sequence with:
 
 ```bash
@@ -161,6 +181,7 @@ pnpm verify
 - the complete driver display against a controlled telemetry reliability
   scenario;
 - the complete cabin display against the same scenario.
+- both displays concurrently against one dynamically allocated 60 Hz source.
 
 The scenario proves valid data, stale data, malformed input, disconnection, and
 reconnection. It uses the `offscreen` platform and software Qt Quick backend.

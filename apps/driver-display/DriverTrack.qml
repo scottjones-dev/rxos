@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 Item {
     id: track
     required property RxTokens theme
     required property var telemetry
+    required property PresentationFormatter formatter
     required property bool live
 
     RowLayout {
@@ -25,7 +27,7 @@ Item {
                 accentColor: track.telemetry.rpm > 8000 ? track.theme.caution : track.theme.accent
             }
             RowLayout {
-                RxMetric { Layout.fillWidth: true; theme: track.theme; label: "SPEED"; value: Math.round(track.telemetry.speedKph); unit: "km/h"; available: track.live }
+                RxMetric { Layout.fillWidth: true; theme: track.theme; label: "SPEED"; value: track.formatter.speed(track.telemetry.speedKph); available: track.live }
                 RxMetric { Layout.fillWidth: true; theme: track.theme; label: "GEAR"; value: track.telemetry.gear; available: track.live }
                 RxMetric { Layout.fillWidth: true; theme: track.theme; label: "THROTTLE"; value: Math.round(track.telemetry.throttlePercent); unit: "%"; available: track.live }
             }

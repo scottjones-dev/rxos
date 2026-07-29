@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 project(rxos_displays VERSION 0.1 LANGUAGES CXX)
 
 enable_testing()
+add_subdirectory(packages/design-system)
 add_subdirectory(apps/driver-display)
 add_subdirectory(apps/cabin-display)
 
@@ -18,6 +19,9 @@ add_test(
 set(RXOS_RELIABILITY_RUNNER
     "${CMAKE_SOURCE_DIR}/apps/vehicle-simulator/dist/src/display-reliability-runner.js"
 )
+set(RXOS_CONCURRENT_RUNNER
+    "${CMAKE_SOURCE_DIR}/apps/validation-tools/dist/src/concurrent-reliability.js"
+)
 add_test(
     NAME driver-display-reliability
     COMMAND "${NODE_EXECUTABLE}" "${RXOS_RELIABILITY_RUNNER}"
@@ -27,6 +31,10 @@ add_test(
     NAME cabin-display-reliability
     COMMAND "${NODE_EXECUTABLE}" "${RXOS_RELIABILITY_RUNNER}"
         "$<TARGET_FILE:rxos-cabin-display>"
+)
+add_test(
+    NAME concurrent-display-reliability
+    COMMAND "${NODE_EXECUTABLE}" "${RXOS_CONCURRENT_RUNNER}"
 )
 add_test(
     NAME driver-display-profile
@@ -43,10 +51,19 @@ set_tests_properties(
     qml-telemetry-state
     driver-display-reliability
     cabin-display-reliability
+    concurrent-display-reliability
     driver-display-profile
     cabin-display-profile
     PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QSG_RHI_BACKEND=software"
         RUN_SERIAL TRUE
+        TIMEOUT 20
+)
+set_tests_properties(
+    concurrent-display-reliability
+    PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+        ENVIRONMENT
+            "QT_QPA_PLATFORM=offscreen;QSG_RHI_BACKEND=software;RXOS_DRIVER_EXECUTABLE=$<TARGET_FILE:rxos-driver-display>;RXOS_CABIN_EXECUTABLE=$<TARGET_FILE:rxos-cabin-display>"
         TIMEOUT 20
 )

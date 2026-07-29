@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import Rxos.DesignSystem
 
 Item {
     id: diagnostics
@@ -35,4 +36,3 @@ Item {
         }
     }
 }
-

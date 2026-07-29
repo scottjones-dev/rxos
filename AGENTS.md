@@ -57,6 +57,12 @@ review gate in `docs/safety/safety-boundaries.md`.
   breaking change and update Rust, TypeScript, QML and fixtures together.
 - Add tests for validation, stale/lost behaviour and provider changes.
 - Record architecture or safety trade-offs as ADRs before implementation.
+- Keep presentation translations behind stable IDs; never translate schema,
+  log, warning, or diagnostics identifiers.
+- Keep canonical telemetry metric. Convert units only through the shared
+  presentation formatter.
+- Visual baselines require human review. Never regenerate them merely to make
+  a failing comparison green.
 
 ## Commands
 
@@ -69,7 +75,18 @@ pnpm test
 pnpm build
 pnpm demo
 pnpm performance:observe
+pnpm performance:native:short
+pnpm performance:native:extended
 pnpm verify:node
+pnpm localisation:validate
+pnpm layout:test
+pnpm concurrent:launch
+pnpm concurrent:test
+pnpm visual:baseline
+pnpm visual:capture
+pnpm visual:compare
+pnpm visual:gallery
+pnpm visual:verify
 
 pnpm native:format
 pnpm native:format:check
@@ -83,6 +100,7 @@ pnpm qt:build
 pnpm qt:test
 
 pnpm verify
+pnpm verify:milestone-1.3
 ```
 
 Run the TypeScript simulator with
@@ -117,3 +135,13 @@ rxos-vehicle-gateway`, with the same playback flag.
 15. Treat daylight/night readability, distraction, touch reach, and physical
     display scaling as human-review items until checked on representative
     hardware.
+16. Preserve deterministic visual inputs, the pinned software renderer, and
+    the reviewed Ubuntu baseline matrix.
+17. Run localisation validation and both pseudo-locale captures after changing
+    presentation text.
+18. Keep development translations clearly non-authoritative and machine
+    identifiers stable.
+19. Keep concurrent test ports dynamically allocated and child-process cleanup
+    bounded.
+20. Publish performance numbers as host observations, never as real-time or
+    automotive guarantees.

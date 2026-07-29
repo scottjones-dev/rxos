@@ -9,8 +9,13 @@ QtObject {
     property alias hasSample: telemetryStateObject.hasSample
     property alias stale: telemetryStateObject.stale
     property alias invalidMessages: telemetryStateObject.invalidMessages
+    property alias acceptedMessages: telemetryStateObject.acceptedMessages
+    property alias lastSequence: telemetryStateObject.lastSequence
+    property alias laggedMessages: telemetryStateObject.laggedMessages
     property alias data: telemetryStateObject.data
     property alias reliabilityComplete: telemetryStateObject.reliabilityComplete
+    property int acceptEvery: 1
+    property int receivedMessages: 0
 
     readonly property double rpm: telemetryStateObject.data.rpm
     readonly property double speedKph: telemetryStateObject.data.speedKph
@@ -33,7 +38,13 @@ QtObject {
     property WebSocket socket: WebSocket {
         url: store.endpoint
         active: true
-        onTextMessageReceived: message => store.telemetryState.accept(message)
+        onTextMessageReceived: message => {
+            store.receivedMessages += 1
+            if (store.receivedMessages % Math.max(1, store.acceptEvery) === 0)
+                store.telemetryState.accept(message)
+            else
+                store.telemetryState.laggedMessages += 1
+        }
         onStatusChanged: {
             store.telemetryState.setTransportConnected(status === WebSocket.Open)
             if (status === WebSocket.Closed || status === WebSocket.Error)

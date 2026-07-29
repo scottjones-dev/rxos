@@ -32,3 +32,8 @@ Font legibility, colour perception, glare, motion comfort, touch reach, focus
 order, screen-reader strategy, localisation expansion, and distraction require
 human review on representative hardware. This milestone is not an accessibility
 or automotive human-factors certification.
+
+Milestone 1.3 adds expanded and RTL pseudo-locales, explicit layout-invariant
+tests, and formal driver, cabin, warning, accessibility, localisation, and
+physical-prototype checklists. Automation detects structural regressions; it
+does not validate cognition, distraction, reach, readability, or mounting.

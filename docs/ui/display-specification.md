@@ -39,6 +39,12 @@ Invalid or unsafe command-line values fall back to profile defaults. A future
 deployment configuration adapter may supply the same four values without
 changing page layout code.
 
+Milestone 1.3 also supports development-only `--locale`, `--units`,
+`--telemetry-endpoint`, `--visual-scenario`, and `--capture` options. Supported
+scale stress points are 0.8, 1.0, and 1.25. Shared layout predicates check safe
+bounds, warning separation, focus order, scrolling, and the scaled 56-by-56
+touch minimum. See `docs/testing/layout-invariants.md`.
+
 ## Human review
 
 Daylight readability, night glare, colour accuracy, viewing angle, touch

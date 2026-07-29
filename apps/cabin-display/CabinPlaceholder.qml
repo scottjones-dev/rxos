@@ -1,4 +1,5 @@
 import QtQuick
+import Rxos.DesignSystem
 
 Item {
     id: placeholder
@@ -13,4 +14,3 @@ Item {
         message: placeholder.message
     }
 }
-

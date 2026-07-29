@@ -9,6 +9,7 @@ QtObject {
     property bool stale: true
     property int invalidMessages: 0
     property int acceptedMessages: 0
+    property double lastSequence: -1
     property int laggedMessages: 0
     property int schemaVersion: 0
     property string source: "none"
@@ -115,6 +116,7 @@ QtObject {
         schemaVersion = envelope.schemaVersion
         source = envelope.source
         capturedAtMs = parsedCapturedAt
+        lastSequence = envelope.sequence
         acceptedMessages += 1
         hasSample = true
         stale = false

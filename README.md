@@ -2,7 +2,7 @@
 
 RXOS is an experimental dual-screen infotainment and instrument-cluster
 platform for a Mazda RX-8. This repository currently contains a desktop
-simulator and the milestone 1.2 dual-display visual foundation.
+simulator and the milestone 1.3 hardware-independent validation foundation.
 
 > RXOS is read-only and is not a certified vehicle instrument. Milestone one
 > must not be connected to a vehicle or used to control any vehicle system.
@@ -24,6 +24,9 @@ simulator and the milestone 1.2 dual-display visual foundation.
   profiles, keyboard/rotary-style focus support, and bounded telemetry charts.
 - Browser developer console for inspecting the stream.
 - Loss-of-data and stale-data presentation.
+- Shared Qt localisation and metric/UK/US presentation formatting.
+- Deterministic headless screenshots, layout invariants, concurrent-display
+  reliability tests, and a development review gallery.
 - TypeScript unit/integration tests and Rust provider/contract tests.
 
 ## Quick start
@@ -56,6 +59,21 @@ Complete verification, including Rust and Qt:
 ```bash
 pnpm verify
 ```
+
+Milestone 1.3 validation commands:
+
+```bash
+pnpm concurrent:launch
+pnpm localisation:validate
+pnpm layout:test
+pnpm visual:verify
+pnpm performance:native:short
+pnpm verify:milestone-1.3
+```
+
+Visual comparison is automated evidence only. Use the checklists in
+`docs/review`; physical readability, touch reach, mounting, distraction, and
+automotive safety have not been validated.
 
 Run the deterministic milestone 1.2 scenario server with `pnpm demo`. Launch
 the driver display with `--demo-cycle` to cycle Daily, Performance, and Track

@@ -19,21 +19,15 @@ foreach(RXOS_QML_FILE IN LISTS RXOS_CABIN_QML)
         "${RXOS_QML_FILE}" PROPERTIES QT_RESOURCE_ALIAS "${RXOS_QML_NAME}"
     )
 endforeach()
-file(GLOB RXOS_DESIGN_QML CONFIGURE_DEPENDS
-    "${CMAKE_SOURCE_DIR}/packages/design-system/qml/*.qml"
-)
-foreach(RXOS_QML_FILE IN LISTS RXOS_DESIGN_QML)
-    get_filename_component(RXOS_QML_NAME "${RXOS_QML_FILE}" NAME)
-    set_source_files_properties(
-        "${RXOS_QML_FILE}" PROPERTIES QT_RESOURCE_ALIAS "${RXOS_QML_NAME}"
-    )
-endforeach()
-
 qt_add_qml_module(rxos-cabin-display
     URI Rxos.CabinDisplay
     VERSION 1.0
-    QML_FILES ${RXOS_CABIN_QML} ${RXOS_DESIGN_QML}
+    QML_FILES ${RXOS_CABIN_QML}
 )
 target_link_libraries(rxos-cabin-display
-    PRIVATE Qt6::Quick Qt6::QuickControls2 Qt6::WebSockets
+    PRIVATE
+        Qt6::Quick
+        Qt6::QuickControls2
+        Qt6::WebSockets
+        rxos-design-systemplugin
 )
