@@ -16,9 +16,9 @@ QtObject {
     readonly property int safeMargin: Math.round(48 * scale)
 
     function option(name) {
-        const index = arguments.indexOf(name)
-        return index >= 0 && index + 1 < arguments.length
-            ? arguments[index + 1]
+        const index = profiles.arguments.indexOf(name)
+        return index >= 0 && index + 1 < profiles.arguments.length
+            ? profiles.arguments[index + 1]
             : undefined
     }
 
@@ -36,4 +36,3 @@ QtObject {
             : fallback
     }
 }
-
