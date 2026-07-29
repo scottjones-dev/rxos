@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QTranslator>
 #include <csignal>
+#include "native-performance.h"
 
 namespace {
 volatile std::sig_atomic_t shutdownRequested = 0;
@@ -52,10 +53,10 @@ int main(int argc, char *argv[])
         return -1;
     QObject *rootObject = engine.rootObjects().constFirst();
     auto *rootWindow = qobject_cast<QQuickWindow *>(rootObject);
-    quint64 renderedFrames = 0;
+    FrameTimingProbe frameTiming;
     if (rootWindow) {
         QObject::connect(rootWindow, &QQuickWindow::frameSwapped, &application,
-                         [&renderedFrames]() { ++renderedFrames; });
+                         [&frameTiming]() { frameTiming.recordFrame(); });
     }
     qInfo().noquote() << QStringLiteral(
         R"({"component":"cabin-display","event":"ui_ready","startupMs":%1})")
@@ -134,16 +135,22 @@ int main(int argc, char *argv[])
     }
 
     QObject::connect(&application, &QCoreApplication::aboutToQuit, &application,
-                     [rootObject, &startupTimer, &renderedFrames]() {
+                     [rootObject, &startupTimer, &frameTiming]() {
         qInfo().noquote()
-            << QStringLiteral(R"({"component":"cabin-display","event":"shutdown_summary","uptimeMs":%1,"accepted":%2,"received":%3,"lagged":%4,"lastSequence":%5,"renderedFrames":%6,"chartSamples":%7})")
+            << QStringLiteral(R"({"component":"cabin-display","event":"shutdown_summary","uptimeMs":%1,"accepted":%2,"received":%3,"lagged":%4,"lastSequence":%5,"renderedFrames":%6,"chartSamples":%7,"chartPublished":%8,"chartRenderedPoints":%9,"presentationUpdates":%10,"presentationReplacements":%11,"hiddenWork":%12})")
                    .arg(startupTimer.elapsed())
                    .arg(rootObject->property("acceptedMessages").toInt())
                    .arg(rootObject->property("receivedMessages").toInt())
                    .arg(rootObject->property("laggedMessages").toInt())
                    .arg(rootObject->property("lastSequence").toDouble(), 0, 'f', 0)
-                   .arg(renderedFrames)
-                   .arg(rootObject->property("chartSampleCount").toInt());
+                   .arg(frameTiming.frameCount())
+                   .arg(rootObject->property("chartSampleCount").toInt())
+                   .arg(rootObject->property("chartPublishedCount").toInt())
+                   .arg(rootObject->property("chartRenderedPointCount").toInt())
+                   .arg(rootObject->property("presentationUpdateCount").toInt())
+                   .arg(rootObject->property("presentationReplacementCount").toInt())
+                   .arg(rootObject->property("hiddenWorkCount").toInt());
+        qInfo().noquote() << frameTiming.summary(QStringLiteral("cabin-display"));
     });
     const int result = application.exec();
     qInfo().noquote() << R"({"component":"cabin-display","event":"graceful_shutdown"})";

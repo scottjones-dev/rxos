@@ -1,0 +1,98 @@
+name: Extended native performance
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration:
+        description: Observation duration in seconds
+        required: true
+        default: "600"
+        type: choice
+        options:
+          - "600"
+          - "1800"
+          - "3600"
+      topology:
+        description: Process topology
+        required: true
+        default: cabin
+        type: choice
+        options:
+          - simulator
+          - driver
+          - cabin
+          - concurrent
+      scenario:
+        description: Display scenario
+        required: true
+        default: performance
+        type: choice
+        options:
+          - default
+          - daily
+          - performance
+          - track
+          - home
+          - page-switch
+  schedule:
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  observe:
+    name: Linux native observation
+    runs-on: ubuntu-24.04
+    timeout-minutes: 75
+    env:
+      QT_QPA_PLATFORM: offscreen
+      QSG_RHI_BACKEND: software
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - name: Install native build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes \
+            cmake ninja-build build-essential fonts-noto-core \
+            libgl1-mesa-dev libegl1-mesa-dev \
+            libxkbcommon-dev libxkbcommon-x11-0 xvfb
+      - uses: jurplel/install-qt-action@v4
+        with:
+          version: "6.8.3"
+          modules: "qtwebsockets"
+          cache: true
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm qt:configure:release
+      - run: pnpm qt:build:release
+      - run: pnpm performance:native:prepare
+      - name: Run standard or soak observation
+        env:
+          RXOS_DURATION: ${{ inputs.duration || '600' }}
+          RXOS_TOPOLOGY: ${{ inputs.topology || 'cabin' }}
+          RXOS_SCENARIO: ${{ inputs.scenario || 'performance' }}
+        run: |
+          node apps/validation-tools/dist/src/linux-performance.js \
+            --duration "$RXOS_DURATION" \
+            --topology "$RXOS_TOPOLOGY" \
+            --rates 60 \
+            --scenario "$RXOS_SCENARIO" \
+            --output build/performance/extended.json
+      - run: pnpm performance:native:compare build/performance/extended.json
+      - run: pnpm performance:native:artifact build/performance/extended.json build/performance/extended.md
+      - name: Upload observation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rxos-native-performance-extended
+          if-no-files-found: error
+          path: build/performance

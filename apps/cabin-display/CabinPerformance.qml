@@ -7,16 +7,9 @@ Item {
     required property RxTokens theme
     required property var telemetry
     required property PresentationFormatter formatter
+    required property BoundedHistory history
     readonly property bool live: telemetry.status === "LIVE"
-    readonly property int sampleCount: rpmHistory.length
-    BoundedHistory { id: rpmHistory; capacity: 600; downsampleEvery: 6 }
-    Connections {
-        target: performance.telemetry.telemetryState
-        function onDataChanged() {
-            if (performance.visible)
-                rpmHistory.append(Date.now(), performance.telemetry.rpm, performance.live)
-        }
-    }
+    readonly property int sampleCount: history.length
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: performance.theme.safeMargin
@@ -55,11 +48,11 @@ Item {
             Layout.fillHeight: true
             theme: performance.theme
             heading: "RPM history"
-            subtitle: rpmHistory.length + " / " + rpmHistory.capacity + " bounded samples · gaps retained"
+            subtitle: performance.history.length + " / " + performance.history.capacity + " bounded samples · gaps retained"
             RxChart {
                 anchors.fill: parent
                 theme: performance.theme
-                values: rpmHistory.values
+                values: performance.history.values
                 minimum: 0
                 maximum: 10000
                 stale: !performance.live

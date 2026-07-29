@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
 import { WebSocket, WebSocketServer } from "ws";
 import { simulatedEnvelope } from "@rxos/telemetry-fixtures";
 import {
@@ -203,7 +204,7 @@ function parseArguments(argv: readonly string[]): {
 }
 
 const entryPoint = process.argv[1];
-if (entryPoint && import.meta.url === new URL(entryPoint, "file:").href) {
+if (entryPoint && import.meta.url === pathToFileURL(entryPoint).href) {
   const options = parseArguments(process.argv.slice(2));
   const server = await startSimulator(options.port, options.recordingPath, {
     updateHz: options.updateHz,

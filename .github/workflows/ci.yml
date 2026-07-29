@@ -70,7 +70,7 @@ jobs:
             cmake ninja-build build-essential \
             fonts-noto-core \
             libgl1-mesa-dev libegl1-mesa-dev \
-            libxkbcommon-dev libxkbcommon-x11-0
+            libxkbcommon-dev libxkbcommon-x11-0 xvfb
       - uses: jurplel/install-qt-action@v4
         with:
           version: "6.8.3"
@@ -80,6 +80,8 @@ jobs:
       - run: pnpm qt:configure
       - run: pnpm qt:lint
       - run: pnpm qt:build
+      - run: pnpm qt:configure:release
+      - run: pnpm qt:build:release
       - name: Build display reliability runner and dependencies
         run: pnpm --filter @rxos/vehicle-simulator... build
       - name: Build milestone 1.3 validation tooling
@@ -87,12 +89,31 @@ jobs:
       - run: pnpm localisation:validate
       - run: pnpm qt:test
       - run: pnpm visual:verify
-      - run: pnpm performance:native:short
+      - name: Short native driver profile
+        run: pnpm performance:native:driver
+      - name: Short native cabin profile
+        run: pnpm performance:native:cabin
+      - name: Short concurrent native profile
+        run: pnpm performance:native:concurrent
+      - name: Chart stress profile
+        run: pnpm performance:native:chart
+      - name: Xvfb cabin profile
+        run: |
+          xvfb-run -a env QT_QPA_PLATFORM=xcb QSG_RHI_BACKEND=software \
+            node apps/validation-tools/dist/src/linux-performance.js \
+              --duration 60 --topology cabin --rates 60 --scenario home \
+              --output build/performance/native-cabin-xvfb.json
+      - name: Check stable performance invariants
+        run: |
+          pnpm performance:native:compare build/performance/native-concurrent-short.json
+          pnpm performance:native:compare build/performance/chart-stress.json
+      - name: Create native performance summary
+        run: pnpm performance:native:artifact build/performance/native-concurrent-short.json build/performance/native-concurrent-short.md
       - name: Upload visual and performance review evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: rxos-milestone-1.3-review
+          name: rxos-milestone-1.4-review
           if-no-files-found: warn
           path: |
             tests/visual/baselines

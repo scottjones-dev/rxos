@@ -7,6 +7,7 @@ Canvas {
     property real minimum: 0
     property real maximum: 100
     property bool stale: false
+    readonly property int renderedPointCount: values.length
     implicitWidth: 520 * theme.scale
     implicitHeight: 220 * theme.scale
     onValuesChanged: requestPaint()
@@ -44,4 +45,3 @@ Canvas {
         context.stroke()
     }
 }
-

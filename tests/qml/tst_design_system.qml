@@ -128,9 +128,46 @@ TestCase {
         for (let index = 0; index < 36000; index += 1)
             history.append(index * (1000 / 60), index, index % 997 !== 0)
         compare(history.length, 600)
+        verify(history.values.length <= 240)
         compare(history.receivedCount, 36000)
         verify(history.values.some(sample => sample.value === null))
         history.destroy()
+    }
+
+    function test_history_publication_and_clear_are_bounded() {
+        const history = create(historyComponent, {
+            capacity: 10,
+            publishEvery: 3,
+            maximumRenderedPoints: 4
+        })
+        for (let index = 0; index < 30; index += 1)
+            history.append(index, index, true)
+        compare(history.length, 10)
+        verify(history.values.length <= 4)
+        verify(history.publishedCount < history.receivedCount)
+        history.clear()
+        compare(history.length, 0)
+        compare(history.values.length, 0)
+        history.destroy()
+    }
+
+    function test_presentation_uses_latest_value_without_a_queue() {
+        const store = create(storeComponent)
+        store.socket.active = false
+        const presentation = create(presentationComponent, { source: store })
+        store.telemetryState.data = Object.assign({}, store.telemetryState.data,
+                                                   { rpm: 1000 })
+        presentation.queueLatest()
+        store.telemetryState.data = Object.assign({}, store.telemetryState.data,
+                                                   { rpm: 2000 })
+        presentation.queueLatest()
+        verify(presentation.pending)
+        presentation.publishLatest()
+        compare(presentation.rpm, 2000)
+        compare(presentation.publicationCount, 1)
+        verify(presentation.replacedPendingCount >= 1)
+        presentation.destroy()
+        store.destroy()
     }
 
     Component { id: tokensComponent; Design.RxTokens {} }
@@ -142,5 +179,6 @@ TestCase {
     Component { id: warningComponent; Design.WarningModel {} }
     Component { id: settingsComponent; Design.DisplaySettings {} }
     Component { id: historyComponent; Design.BoundedHistory {} }
+    Component { id: storeComponent; Design.TelemetryStore {} }
+    Component { id: presentationComponent; Design.PresentationTelemetry {} }
 }
-

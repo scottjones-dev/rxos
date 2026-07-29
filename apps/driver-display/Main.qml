@@ -28,6 +28,11 @@ ApplicationWindow {
         endpoint: profile.option("--telemetry-endpoint") || "ws://127.0.0.1:8787/telemetry"
         acceptEvery: Number(profile.option("--accept-every") || 1)
     }
+    PresentationTelemetry {
+        id: presentationTelemetry
+        source: telemetry
+        maximumHz: Number(profile.option("--presentation-hz") || 30)
+    }
     WarningModel {
         id: warningModel
         telemetryWarnings: telemetry.data.warnings
@@ -47,7 +52,13 @@ ApplicationWindow {
     readonly property int laggedMessages: telemetry.laggedMessages
     readonly property double lastSequence: telemetry.lastSequence
     readonly property int chartSampleCount: 0
+    readonly property int chartPublishedCount: 0
+    readonly property int chartRenderedPointCount: 0
+    readonly property int presentationUpdateCount: presentationTelemetry.publicationCount
+    readonly property int presentationReplacementCount: presentationTelemetry.replacedPendingCount
+    readonly property int hiddenWorkCount: 0
     readonly property string requestedScenario: profile.option("--visual-scenario") || ""
+    readonly property string requestedProfileScenario: profile.option("--profile-scenario") || "daily"
     readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
     readonly property bool live: telemetry.status === "LIVE"
     readonly property string currentMode: settings.driverMode
@@ -59,10 +70,26 @@ ApplicationWindow {
         scenario: window.requestedScenario || "normal"
         driver: true
     }
+    Connections {
+        target: visualScenario
+        function onReadyChanged() {
+            if (visualScenario.ready)
+                presentationTelemetry.publishLatest()
+        }
+    }
 
     function setMode(mode) {
         if (modeState.select(mode))
             settings.driverMode = mode
+    }
+
+    Component.onCompleted: {
+        if (requestedProfileScenario === "performance")
+            setMode("Performance")
+        else if (requestedProfileScenario === "track")
+            setMode("Track")
+        else
+            setMode("Daily")
     }
 
     Timer {
@@ -123,7 +150,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 visible: window.currentMode === "Daily"
                 theme: window.theme
-                telemetry: telemetry
+                telemetry: presentationTelemetry
                 formatter: formatter
                 live: window.live
             }
@@ -131,7 +158,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 visible: window.currentMode === "Performance"
                 theme: window.theme
-                telemetry: telemetry
+                telemetry: presentationTelemetry
                 formatter: formatter
                 live: window.live
             }
@@ -139,7 +166,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 visible: window.currentMode === "Track"
                 theme: window.theme
-                telemetry: telemetry
+                telemetry: presentationTelemetry
                 formatter: formatter
                 live: window.live
             }

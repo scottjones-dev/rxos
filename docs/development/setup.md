@@ -38,7 +38,7 @@ sudo apt-get update
 sudo apt-get install --yes \
   build-essential cmake ninja-build fonts-noto-core \
   libgl1-mesa-dev libegl1-mesa-dev \
-  libxkbcommon-dev libxkbcommon-x11-0
+    libxkbcommon-dev libxkbcommon-x11-0 xvfb
 ```
 
 Install Qt 6.5 or newer with Qt Quick, Quick Controls 2, WebSockets, Test, Quick
@@ -149,7 +149,7 @@ normal, high-RPM, warning, stale, disconnect, and recovery scenario.
 `pnpm performance:observe` runs the host-side virtual ten-minute 60 Hz
 processing and bounded-history observation. It is not a real-time benchmark.
 
-For the native milestone 1.3 workflow:
+For milestone 1.3 reliability and visual validation:
 
 ```bash
 pnpm concurrent:launch
@@ -159,9 +159,43 @@ pnpm layout:test
 pnpm visual:baseline
 pnpm visual:verify
 pnpm performance:native:short
-pnpm performance:native:extended
 pnpm verify:milestone-1.3
 ```
+
+For milestone 1.4, configure a separate release tree before collecting native
+performance evidence:
+
+```bash
+pnpm qt:configure:release
+pnpm qt:build:release
+pnpm performance:native:driver
+pnpm performance:native:cabin
+pnpm performance:native:concurrent
+pnpm performance:native:matrix
+pnpm performance:native:frame
+pnpm performance:native:chart
+pnpm performance:native:10m
+pnpm performance:native:soak
+```
+
+Short commands run for 60–120 seconds. `performance:native:10m` genuinely runs
+for ten minutes and `performance:native:soak` for thirty minutes. Do not report
+either as complete without its generated artifact. `performance:native:memory`
+is a focused ten-minute cabin observation.
+
+Create a Markdown artifact or check stable invariants with:
+
+```bash
+pnpm performance:native:artifact build/performance/native-concurrent-short.json build/performance/native-concurrent-short.md
+pnpm performance:native:compare build/performance/native-concurrent-short.json
+pnpm performance:native:compare candidate.json baseline.json comparison.json
+```
+
+Comparison returns an explicit non-comparable result when environments differ.
+The scheduled/manual `Extended native performance` GitHub workflow supplies
+10, 30 and 60-minute Linux evidence. Xvfb experiments should use
+`QT_QPA_PLATFORM=xcb xvfb-run ...` and must not be compared with offscreen
+reports.
 
 Baseline generation is an intentional review action: inspect the generated
 gallery before committing changed images. Native tools honour
@@ -208,7 +242,13 @@ pnpm qt:configure
 pnpm qt:lint
 pnpm qt:build
 pnpm qt:test
+pnpm qt:configure:release
+pnpm qt:build:release
 ```
+
+CI also runs 60-second driver, cabin and concurrent release observations, a
+120-second chart stress observation, stable-invariant comparison and artifact
+generation.
 
 ## Troubleshooting
 

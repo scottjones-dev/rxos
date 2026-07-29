@@ -9,6 +9,7 @@ find_package(Qt6 6.5 REQUIRED COMPONENTS Quick QuickControls2 WebSockets)
 qt_standard_project_setup(REQUIRES 6.5)
 
 qt_add_executable(rxos-driver-display main.cpp)
+target_include_directories(rxos-driver-display PRIVATE "${CMAKE_SOURCE_DIR}/tooling")
 
 file(GLOB RXOS_DRIVER_QML CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"

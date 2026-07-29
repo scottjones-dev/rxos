@@ -2,7 +2,7 @@
 
 RXOS is an experimental dual-screen infotainment and instrument-cluster
 platform for a Mazda RX-8. This repository currently contains a desktop
-simulator and the milestone 1.3 hardware-independent validation foundation.
+simulator and the milestone 1.4 native-performance investigation foundation.
 
 > RXOS is read-only and is not a certified vehicle instrument. Milestone one
 > must not be connected to a vehicle or used to control any vehicle system.
@@ -27,6 +27,8 @@ simulator and the milestone 1.3 hardware-independent validation foundation.
 - Shared Qt localisation and metric/UK/US presentation formatting.
 - Deterministic headless screenshots, layout invariants, concurrent-display
   reliability tests, and a development review gallery.
+- Release-mode native profiling with bounded frame timing, Linux memory detail,
+  chart-work counters and environment-aware comparisons.
 - TypeScript unit/integration tests and Rust provider/contract tests.
 
 ## Quick start
@@ -70,6 +72,25 @@ pnpm visual:verify
 pnpm performance:native:short
 pnpm verify:milestone-1.3
 ```
+
+Milestone 1.4 native investigation commands:
+
+```bash
+pnpm qt:configure:release
+pnpm qt:build:release
+pnpm performance:native:driver
+pnpm performance:native:cabin
+pnpm performance:native:concurrent
+pnpm performance:native:frame
+pnpm performance:native:memory
+pnpm performance:native:chart
+pnpm performance:native:compare build/performance/native-concurrent-short.json
+pnpm verify:milestone-1.4
+```
+
+Native CPU, memory and frame figures are host observations, not representative
+hardware or automotive qualification. See `docs/performance` and the
+representative-hardware review plan before interpreting them.
 
 Visual comparison is automated evidence only. Use the checklists in
 `docs/review`; physical readability, touch reach, mounting, distraction, and

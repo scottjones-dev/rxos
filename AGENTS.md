@@ -76,7 +76,17 @@ pnpm build
 pnpm demo
 pnpm performance:observe
 pnpm performance:native:short
-pnpm performance:native:extended
+pnpm performance:native:10m
+pnpm performance:native:soak
+pnpm performance:native:driver
+pnpm performance:native:cabin
+pnpm performance:native:concurrent
+pnpm performance:native:matrix
+pnpm performance:native:frame
+pnpm performance:native:memory
+pnpm performance:native:chart
+pnpm performance:native:compare
+pnpm performance:native:artifact
 pnpm verify:node
 pnpm localisation:validate
 pnpm layout:test
@@ -95,12 +105,15 @@ pnpm native:test
 pnpm native:verify
 
 pnpm qt:configure
+pnpm qt:configure:release
 pnpm qt:lint
 pnpm qt:build
+pnpm qt:build:release
 pnpm qt:test
 
 pnpm verify
 pnpm verify:milestone-1.3
+pnpm verify:milestone-1.4
 ```
 
 Run the TypeScript simulator with
@@ -145,3 +158,13 @@ rxos-vehicle-gateway`, with the same playback flag.
     bounded.
 20. Publish performance numbers as host observations, never as real-time or
     automotive guarantees.
+21. Keep telemetry validation, warnings, freshness, disconnect and reconnect
+    processing immediate. Cadence-limit only non-safety presentation work and
+    use latest-value replacement rather than a queue.
+22. Keep native performance reports environment-keyed. Never compare debug and
+    release, offscreen and Xvfb, or different rendering backends as if they
+    were equivalent.
+23. Treat short profiles as regression evidence only. A memory classification
+    requires a genuinely completed run of at least ten minutes.
+24. Preserve the 600-sample chart retention cap, 240-point render cap and
+    inactive-page work tests unless an evidence-backed ADR changes them.
