@@ -5,36 +5,37 @@ QtObject {
     id: store
 
     property url endpoint: "ws://127.0.0.1:8787/telemetry"
-    property alias status: telemetryState.status
-    property alias hasSample: telemetryState.hasSample
-    property alias stale: telemetryState.stale
-    property alias invalidMessages: telemetryState.invalidMessages
-    property alias data: telemetryState.data
-    property alias reliabilityComplete: telemetryState.reliabilityComplete
+    property alias status: telemetryStateObject.status
+    property alias hasSample: telemetryStateObject.hasSample
+    property alias stale: telemetryStateObject.stale
+    property alias invalidMessages: telemetryStateObject.invalidMessages
+    property alias data: telemetryStateObject.data
+    property alias reliabilityComplete: telemetryStateObject.reliabilityComplete
 
-    readonly property double rpm: telemetryState.data.rpm
-    readonly property double speedKph: telemetryState.data.speedKph
-    readonly property string gear: telemetryState.data.gear
-    readonly property double throttlePercent: telemetryState.data.throttlePercent
-    readonly property double coolantTempC: telemetryState.data.coolantTempC
-    readonly property double oilTempC: telemetryState.data.oilTempC
-    readonly property double oilPressureKpa: telemetryState.data.oilPressureKpa
-    readonly property double fuelPercent: telemetryState.data.fuelPercent
-    readonly property double batteryVoltage: telemetryState.data.batteryVoltage
-    readonly property bool checkEngineWarning: telemetryState.data.warnings.checkEngine
-    readonly property bool coolantWarning: telemetryState.data.warnings.coolantTemperature
-    readonly property bool lowFuelWarning: telemetryState.data.warnings.lowFuel
-    readonly property bool lowOilPressureWarning: telemetryState.data.warnings.lowOilPressure
+    readonly property double rpm: telemetryStateObject.data.rpm
+    readonly property double speedKph: telemetryStateObject.data.speedKph
+    readonly property string gear: telemetryStateObject.data.gear
+    readonly property double throttlePercent: telemetryStateObject.data.throttlePercent
+    readonly property double coolantTempC: telemetryStateObject.data.coolantTempC
+    readonly property double oilTempC: telemetryStateObject.data.oilTempC
+    readonly property double oilPressureKpa: telemetryStateObject.data.oilPressureKpa
+    readonly property double fuelPercent: telemetryStateObject.data.fuelPercent
+    readonly property double batteryVoltage: telemetryStateObject.data.batteryVoltage
+    readonly property bool checkEngineWarning: telemetryStateObject.data.warnings.checkEngine
+    readonly property bool coolantWarning: telemetryStateObject.data.warnings.coolantTemperature
+    readonly property bool lowFuelWarning: telemetryStateObject.data.warnings.lowFuel
+    readonly property bool lowOilPressureWarning: telemetryStateObject.data.warnings.lowOilPressure
 
     property TelemetryState telemetryState: TelemetryState {
+        id: telemetryStateObject
     }
 
     property WebSocket socket: WebSocket {
         url: store.endpoint
         active: true
-        onTextMessageReceived: message => telemetryState.accept(message)
+        onTextMessageReceived: message => store.telemetryState.accept(message)
         onStatusChanged: {
-            telemetryState.setTransportConnected(status === WebSocket.Open)
+            store.telemetryState.setTransportConnected(status === WebSocket.Open)
             if (status === WebSocket.Closed || status === WebSocket.Error)
                 store.reconnect.start()
         }
@@ -44,7 +45,7 @@ QtObject {
         interval: 100
         repeat: true
         running: true
-        onTriggered: telemetryState.updateFreshness(Date.now())
+        onTriggered: store.telemetryState.updateFreshness(Date.now())
     }
 
     property Timer reconnect: Timer {
