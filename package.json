@@ -55,7 +55,7 @@
     "qt:test": "ctest --test-dir build/native --output-on-failure",
     "qt:build:release": "cmake --build build/release --parallel",
     "preview:desktop": "build/native/apps/desktop-preview/rxos-desktop-preview",
-    "preview:desktop:windows": "build/native/apps/desktop-preview/rxos-desktop-preview.exe",
+    "preview:desktop:windows": ".\\build\\native\\apps\\desktop-preview\\rxos-desktop-preview.exe",
     "layout:test": "pnpm qt:test --tests-regex qml-telemetry-state",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
