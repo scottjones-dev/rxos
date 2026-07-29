@@ -124,7 +124,8 @@ Item {
             maximum: 10000
             displayValue: road.live ? road.telemetry.gear : "—"
             unit: "GEAR"
-            label: Math.round(road.telemetry.rpm) + " rpm"
+            label: road.live
+                ? Math.round(road.telemetry.rpm) + " rpm" : "Engine speed"
             secondary: "SIMULATED REDLINE"
             accentColor: road.telemetry.rpm > 8000
                 ? road.theme.performance : road.theme.navigation

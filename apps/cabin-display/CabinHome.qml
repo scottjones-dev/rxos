@@ -131,7 +131,7 @@ Item {
                 }
                 RxCard {
                     Layout.fillWidth: true
-                    Layout.preferredHeight: 150 * home.theme.scale
+                    Layout.preferredHeight: 190 * home.theme.scale
                     theme: home.theme
                     heading: "Your RX-8"
                     subtitle: home.live
