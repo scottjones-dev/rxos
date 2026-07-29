@@ -13,6 +13,12 @@ qt_add_executable(rxos-driver-display main.cpp)
 file(GLOB RXOS_DRIVER_QML CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/*.qml"
 )
+foreach(RXOS_QML_FILE IN LISTS RXOS_DRIVER_QML)
+    get_filename_component(RXOS_QML_NAME "${RXOS_QML_FILE}" NAME)
+    set_source_files_properties(
+        "${RXOS_QML_FILE}" PROPERTIES QT_RESOURCE_ALIAS "${RXOS_QML_NAME}"
+    )
+endforeach()
 file(GLOB RXOS_DESIGN_QML CONFIGURE_DEPENDS
     "${CMAKE_SOURCE_DIR}/packages/design-system/qml/*.qml"
 )
