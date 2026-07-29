@@ -97,16 +97,12 @@ int main(int argc, char *argv[])
                     return;
                 }
                 QDir().mkpath(QFileInfo(capturePath).absolutePath());
-                QObject::connect(window, &QQuickWindow::frameSwapped, &application,
-                                 [&application, window, capturePath]() {
-                    const bool saved = window->grabWindow().save(capturePath);
-                    qInfo().noquote()
-                        << QStringLiteral(R"({"component":"driver-display","event":"visual_capture","saved":%1,"path":"%2"})")
-                               .arg(saved ? QStringLiteral("true") : QStringLiteral("false"),
-                                    capturePath);
-                    application.exit(saved ? 0 : 3);
-                }, Qt::SingleShotConnection);
-                window->requestUpdate();
+                const bool saved = window->grabWindow().save(capturePath);
+                qInfo().noquote()
+                    << QStringLiteral(R"({"component":"driver-display","event":"visual_capture","saved":%1,"path":"%2"})")
+                           .arg(saved ? QStringLiteral("true") : QStringLiteral("false"),
+                                capturePath);
+                application.exit(saved ? 0 : 3);
             }
         });
         timeout.setSingleShot(true);

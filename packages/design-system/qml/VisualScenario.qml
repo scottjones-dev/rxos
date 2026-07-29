@@ -49,6 +49,8 @@ QtObject {
 
     function apply() {
         telemetry.socket.active = false
+        telemetry.freshness.running = false
+        telemetry.reconnect.stop()
         if (scenario.includes("day"))
             settings.themeSelection = "day"
         else

@@ -45,7 +45,7 @@ QtObject {
             else
                 store.telemetryState.laggedMessages += 1
         }
-        onStatusChanged: {
+        onStatusChanged: function() {
             store.telemetryState.setTransportConnected(status === WebSocket.Open)
             if (status === WebSocket.Closed || status === WebSocket.Error)
                 store.reconnect.start()
