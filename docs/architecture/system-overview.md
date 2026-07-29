@@ -100,6 +100,15 @@ are explicitly outside this milestone.
 
 ## Phased implementation plan
 
+## Mobile companion
+
+`apps/mobile` is a separate Expo/React Native presentation runtime. It shares
+the TypeScript telemetry contract, mobile API domain logic, state semantics,
+and design tokens, but not QML components. It connects only to the existing
+local WebSocket stream or deterministic fixtures. Local AsyncStorage contains
+presentation settings and a last-known validated snapshot; cached values are
+never presented as live.
+
 ### Phase 1 — desktop telemetry vertical slice
 
 Create the monorepo, typed telemetry contract, deterministic simulator, Rust

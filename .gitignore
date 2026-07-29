@@ -4,9 +4,13 @@ coverage/
 target/
 .turbo/
 .vite/
+.expo/
+expo-env.d.ts
 CMakeFiles/
 CMakeCache.txt
 cmake-build-*/
 build/
+apps/mobile/web-build/
 *.user
+aqtinstall.log
 .DS_Store

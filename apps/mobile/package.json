@@ -1,0 +1,43 @@
+{
+  "name": "@rxos/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "android": "expo start --android",
+    "build": "expo export --platform web",
+    "dev": "expo start",
+    "ios": "expo start --ios",
+    "lint": "eslint app src test",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@rxos/mobile-api-client": "workspace:*",
+    "@rxos/mobile-design-tokens": "workspace:*",
+    "@rxos/vehicle-schema": "workspace:*",
+    "@tanstack/react-query": "^5.83.0",
+    "expo": "~57.0.9",
+    "expo-constants": "~57.0.8",
+    "expo-linking": "~57.0.4",
+    "expo-router": "~57.0.9",
+    "expo-status-bar": "~57.0.1",
+    "nativewind": "5.0.0-preview.4",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-native": "0.86.2",
+    "react-native-css": "3.0.7",
+    "react-native-reanimated": "4.5.1",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-screens": "~4.26.0",
+    "react-native-web": "~0.21.0",
+    "tailwindcss": "^4.1.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.12",
+    "@types/react": "~19.2.2",
+    "postcss": "^8.5.6"
+  }
+}

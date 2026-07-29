@@ -12,6 +12,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  mobile:
+    name: Expo mobile
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.17.0
+          run_install: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm mobile:lint
+      - run: pnpm mobile:typecheck
+      - run: pnpm mobile:test
+      - run: pnpm mobile:prepare
+      - name: Validate Expo configuration
+        run: pnpm --filter @rxos/mobile exec expo config --type public
+      - name: Deterministic fixture-mode web smoke build
+        env:
+          EXPO_PUBLIC_RXOS_FIXTURE_MODE: "true"
+        run: pnpm --filter @rxos/mobile build
+
   node:
     name: Node and TypeScript
     runs-on: ubuntu-24.04

@@ -292,6 +292,20 @@ reconnection. It uses the `offscreen` platform and software Qt Quick backend.
 
 ## CI expectations
 
+## Expo mobile companion
+
+The companion requires only Node.js and pnpm in deterministic fixture mode:
+
+```text
+pnpm mobile:dev
+```
+
+Set `EXPO_PUBLIC_RXOS_FIXTURE_MODE=false` before starting Expo to use the local
+WebSocket simulator. Use `127.0.0.1:8787` only for same-host web or emulator
+development. Physical devices require an explicitly configured private-LAN
+listener and the computer's RFC 1918 address. See `apps/mobile/README.md` for
+Android emulator, device pairing, QR payload, and Windows Firewall guidance.
+
 `.github/workflows/ci.yml` runs on Ubuntu 24.04 for every push and pull request.
 Node, Rust, and Qt checks are separate jobs so a failure identifies the relevant
 toolchain. CI must not omit native checks merely because Node checks pass.

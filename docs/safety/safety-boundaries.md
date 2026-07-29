@@ -16,6 +16,8 @@ Milestone one does not connect to a vehicle.
 - Render telemetry, warnings and placeholders on desktop Qt displays.
 - Store local development settings and simulated trip information.
 - Test loss, corruption, latency and staleness handling.
+- Run a local read-only mobile companion against deterministic fixtures or the
+  existing validated simulator WebSocket.
 
 ## Prohibited
 
@@ -27,6 +29,8 @@ Milestone one does not connect to a vehicle.
   indicators during development.
 - Treating navigation, telemetry or RXOS warnings as authoritative for safe
   vehicle operation.
+- Presenting mobile controls for locks, engine start, physical climate, or any
+  other remote vehicle action, including apparently operational placeholders.
 
 ## Engineering guardrails
 

@@ -34,6 +34,9 @@ review gate in `docs/safety/safety-boundaries.md`.
 
 - TypeScript is strict. Avoid `any`; use `unknown` at trust boundaries and
   validate before narrowing.
+- The Expo mobile companion consumes the shared version-one snapshot contract.
+  Keep fixture mode as the default, label cached data as not live, and do not
+  duplicate telemetry types or imply remote vehicle control.
 - Rust forbids unsafe code. Keep I/O at adapters and deterministic behaviour in
   testable library functions.
 - QML must keep safety and freshness states visible. Aesthetic animation must
@@ -136,6 +139,14 @@ pnpm prototype:verify:software
 pnpm prototype:verify:hardware
 pnpm verify:milestone-1.5
 pnpm verify:milestone-1.6
+pnpm mobile:dev
+pnpm mobile:android
+pnpm mobile:ios
+pnpm mobile:web
+pnpm mobile:test
+pnpm mobile:lint
+pnpm mobile:typecheck
+pnpm mobile:verify
 ```
 
 Run the TypeScript simulator with

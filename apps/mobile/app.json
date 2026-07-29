@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "RXOS Companion",
+    "slug": "rxos-companion",
+    "version": "0.1.0",
+    "orientation": "default",
+    "scheme": "rxos",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "dev.rxos.companion.placeholder"
+    },
+    "android": {
+      "package": "dev.rxos.companion.placeholder",
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "safetyBoundary": "simulated-read-only"
+    }
+  }
+}

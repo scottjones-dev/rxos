@@ -1,0 +1,18 @@
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/preflight.css" layer(base);
+@import "tailwindcss/utilities.css";
+@import "nativewind/theme";
+
+@theme {
+  --color-rx-bg: #090a0c;
+  --color-rx-surface: #121419;
+  --color-rx-raised: #1a1d23;
+  --color-rx-text: #f4f2ed;
+  --color-rx-muted: #969ba5;
+  --color-rx-faint: #666b75;
+  --color-rx-accent: #8ab4ff;
+  --color-rx-success: #6fd59a;
+  --color-rx-warning: #f0b75a;
+  --color-rx-critical: #ff6b6b;
+  --color-rx-border: #272a31;
+}

@@ -1,0 +1,26 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@rxos/mobile-api-client": [
+        "../../packages/mobile-api-client/src/index.ts"
+      ],
+      "@rxos/mobile-design-tokens": [
+        "../../packages/mobile-design-tokens/src/index.ts"
+      ],
+      "@rxos/vehicle-schema": ["../../packages/vehicle-schema/src/index.ts"]
+    }
+  },
+  "include": [
+    "app/**/*.tsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "test/**/*.ts",
+    "nativewind-env.d.ts",
+    ".expo/types/**/*.ts"
+  ]
+}

@@ -2,8 +2,9 @@
 
 RXOS is an experimental dual-screen infotainment and instrument-cluster
 platform for a Mazda RX-8. This repository currently contains a desktop
-simulator, milestone 1.5 representative-hardware qualification tooling, and
-the milestone 1.6 presentation redesign.
+simulator, milestone 1.5 representative-hardware qualification tooling, the
+milestone 1.6 presentation redesign, and the Milestone 1.7 Expo mobile
+companion foundation.
 
 > RXOS is read-only and is not a certified vehicle instrument. Milestone one
 > must not be connected to a vehicle or used to control any vehicle system.
@@ -35,6 +36,8 @@ the milestone 1.6 presentation redesign.
 - Deterministic dual-display profiles, fail-closed role assignment, a temporary
   prototype launcher, review overlays, and redacted diagnostics.
 - TypeScript unit/integration tests and Rust provider/contract tests.
+- RXOS Companion for Expo SDK 57 with Home, Trips, Vehicle, Garage and
+  Settings, deterministic fixture mode, and local simulator WebSocket mode.
 
 ## Quick start
 
@@ -60,6 +63,18 @@ pnpm --filter @rxos/vehicle-simulator dev -- \
 
 For Rust and Qt setup and commands, see
 [`docs/development/setup.md`](docs/development/setup.md).
+
+To open the mobile companion in deterministic fixture mode without Qt, CMake,
+Ninja, Rust, or Visual Studio Build Tools:
+
+```powershell
+pnpm mobile:dev
+```
+
+Press `w` for Expo web, `a` for an Android emulator, or scan Expo's development
+QR using a compatible Expo Go client. See
+[`apps/mobile/README.md`](apps/mobile/README.md) for LAN setup and fixture
+scenarios.
 
 Complete verification, including Rust and Qt:
 
