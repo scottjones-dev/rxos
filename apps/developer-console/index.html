@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RXOS Developer Console</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <p class="eyebrow">RXOS / MILESTONE 1</p>
+          <h1>Telemetry console</h1>
+        </div>
+        <span id="status" class="status lost">LOST</span>
+      </header>
+      <section id="metrics" class="metrics" aria-live="polite"></section>
+      <section class="raw">
+        <h2>Latest typed envelope</h2>
+        <pre id="raw">Waiting for ws://127.0.0.1:8787/telemetry</pre>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

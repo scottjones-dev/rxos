@@ -1,0 +1,25 @@
+{
+  "name": "@rxos/vehicle-simulator",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "dev": "tsx src/main.ts",
+    "lint": "eslint src test",
+    "start": "node dist/src/main.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@rxos/telemetry-fixtures": "workspace:*",
+    "@rxos/vehicle-schema": "workspace:*",
+    "ws": "^8.18.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0",
+    "@types/ws": "^8.18.1",
+    "tsx": "^4.20.3"
+  }
+}

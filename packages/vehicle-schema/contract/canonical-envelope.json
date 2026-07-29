@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "sequence": 42,
+  "capturedAt": "2026-07-29T12:00:00.000Z",
+  "source": "simulation",
+  "telemetry": {
+    "rpm": 4200,
+    "speedKph": 96,
+    "gear": "4",
+    "throttlePercent": 42,
+    "coolantTempC": 88,
+    "oilTempC": 96,
+    "oilPressureKpa": 350,
+    "fuelPercent": 65,
+    "batteryVoltage": 13.9,
+    "warnings": {
+      "checkEngine": false,
+      "coolantTemperature": false,
+      "lowFuel": false,
+      "lowOilPressure": false
+    }
+  }
+}

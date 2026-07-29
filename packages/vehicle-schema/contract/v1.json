@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "wireFormat": "json",
+  "timestamp": {
+    "field": "capturedAt",
+    "format": "RFC3339 UTC",
+    "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$",
+    "nullable": false
+  },
+  "envelopeFields": {
+    "schemaVersion": { "type": "integer", "nullable": false },
+    "sequence": { "type": "non-negative integer", "nullable": false },
+    "capturedAt": { "type": "string", "nullable": false },
+    "source": {
+      "type": "enum",
+      "values": ["simulation", "playback"],
+      "nullable": false
+    },
+    "telemetry": { "type": "object", "nullable": false }
+  },
+  "telemetryFields": {
+    "rpm": { "type": "number", "unit": "rpm", "nullable": false },
+    "speedKph": { "type": "number", "unit": "km/h", "nullable": false },
+    "gear": { "type": "enum", "unit": "selected gear", "nullable": false },
+    "throttlePercent": {
+      "type": "number",
+      "unit": "percent",
+      "nullable": false
+    },
+    "coolantTempC": {
+      "type": "number",
+      "unit": "degrees Celsius",
+      "nullable": false
+    },
+    "oilTempC": {
+      "type": "number",
+      "unit": "degrees Celsius",
+      "nullable": false
+    },
+    "oilPressureKpa": {
+      "type": "number",
+      "unit": "kilopascals",
+      "nullable": false
+    },
+    "fuelPercent": {
+      "type": "number",
+      "unit": "percent",
+      "nullable": false
+    },
+    "batteryVoltage": {
+      "type": "number",
+      "unit": "volts",
+      "nullable": false
+    },
+    "warnings": {
+      "type": "object",
+      "unit": "boolean indicators",
+      "nullable": false
+    }
+  },
+  "warningFields": {
+    "checkEngine": { "type": "boolean", "nullable": false },
+    "coolantTemperature": { "type": "boolean", "nullable": false },
+    "lowFuel": { "type": "boolean", "nullable": false },
+    "lowOilPressure": { "type": "boolean", "nullable": false }
+  }
+}

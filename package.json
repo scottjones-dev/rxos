@@ -1,0 +1,36 @@
+{
+  "name": "rxos",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@11.17.0",
+  "scripts": {
+    "build": "turbo run build",
+    "clean": "turbo run clean",
+    "dev": "turbo run dev --parallel",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "turbo run lint",
+    "native:format": "cargo fmt --all",
+    "native:format:check": "cargo fmt --all -- --check",
+    "native:lint": "cargo clippy --workspace --all-targets --all-features -- -D warnings",
+    "native:test": "cargo test --workspace --all-features",
+    "native:verify": "pnpm native:format:check && pnpm native:lint && pnpm native:test",
+    "qt:build": "cmake --build build/native --parallel",
+    "qt:configure": "cmake -S . -B build/native -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON",
+    "qt:lint": "cmake --build build/native --target all_qmllint",
+    "qt:test": "ctest --test-dir build/native --output-on-failure",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "verify": "pnpm verify:node && pnpm native:verify && pnpm qt:configure && pnpm qt:lint && pnpm qt:build && pnpm qt:test",
+    "verify:node": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.32.0",
+    "eslint": "^9.32.0",
+    "prettier": "^3.6.2",
+    "turbo": "^2.5.5",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.38.0",
+    "vitest": "^3.2.4"
+  }
+}

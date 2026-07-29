@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+target/
+.turbo/
+.vite/
+CMakeFiles/
+CMakeCache.txt
+cmake-build-*/
+build/
+*.user
+.DS_Store
