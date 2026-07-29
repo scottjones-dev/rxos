@@ -3,6 +3,7 @@ project(rxos_design_system VERSION 0.1 LANGUAGES CXX)
 
 find_package(Qt6 6.5 REQUIRED COMPONENTS Quick QuickControls2 WebSockets LinguistTools)
 
+set(CMAKE_AUTOMOC ON)
 qt_add_library(rxos-design-system STATIC)
 
 file(GLOB RXOS_DESIGN_QML CONFIGURE_DEPENDS
