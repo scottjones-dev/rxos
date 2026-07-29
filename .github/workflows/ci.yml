@@ -86,8 +86,6 @@ jobs:
         run: pnpm --filter @rxos/validation-tools... build
       - run: pnpm localisation:validate
       - run: pnpm qt:test
-      - name: Bootstrap deterministic baselines for the first milestone 1.3 run
-        run: pnpm visual:baseline
       - run: pnpm visual:verify
       - run: pnpm performance:native:short
       - name: Upload visual and performance review evidence

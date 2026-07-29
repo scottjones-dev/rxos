@@ -1,0 +1,176 @@
+[
+  {
+    "name": "daily-day",
+    "display": "driver"
+  },
+  {
+    "name": "daily-night",
+    "display": "driver"
+  },
+  {
+    "name": "performance-night",
+    "display": "driver"
+  },
+  {
+    "name": "track-night",
+    "display": "driver"
+  },
+  {
+    "name": "stale",
+    "display": "driver"
+  },
+  {
+    "name": "disconnected",
+    "display": "driver"
+  },
+  {
+    "name": "reconnected",
+    "display": "driver"
+  },
+  {
+    "name": "advisory",
+    "display": "driver"
+  },
+  {
+    "name": "caution-high-coolant",
+    "display": "driver"
+  },
+  {
+    "name": "critical-low-oil",
+    "display": "driver"
+  },
+  {
+    "name": "multiple-low-fuel",
+    "display": "driver"
+  },
+  {
+    "name": "maximum-rpm-high-speed",
+    "display": "driver"
+  },
+  {
+    "name": "high-contrast",
+    "display": "driver"
+  },
+  {
+    "name": "reduced-motion",
+    "display": "driver"
+  },
+  {
+    "name": "home-day",
+    "display": "cabin"
+  },
+  {
+    "name": "home-night",
+    "display": "cabin"
+  },
+  {
+    "name": "navigation",
+    "display": "cabin"
+  },
+  {
+    "name": "media",
+    "display": "cabin"
+  },
+  {
+    "name": "vehicle",
+    "display": "cabin"
+  },
+  {
+    "name": "performance",
+    "display": "cabin"
+  },
+  {
+    "name": "diagnostics",
+    "display": "cabin"
+  },
+  {
+    "name": "settings",
+    "display": "cabin"
+  },
+  {
+    "name": "stale",
+    "display": "cabin"
+  },
+  {
+    "name": "disconnected",
+    "display": "cabin"
+  },
+  {
+    "name": "advisory",
+    "display": "cabin"
+  },
+  {
+    "name": "caution-high-coolant",
+    "display": "cabin"
+  },
+  {
+    "name": "critical-low-oil",
+    "display": "cabin"
+  },
+  {
+    "name": "multiple-low-fuel",
+    "display": "cabin"
+  },
+  {
+    "name": "touch-focus",
+    "display": "cabin"
+  },
+  {
+    "name": "high-contrast",
+    "display": "cabin"
+  },
+  {
+    "name": "reduced-motion",
+    "display": "cabin"
+  },
+  {
+    "name": "pseudo-expanded",
+    "display": "driver",
+    "locale": "en-XA"
+  },
+  {
+    "name": "pseudo-rtl",
+    "display": "driver",
+    "locale": "ar-XB"
+  },
+  {
+    "name": "pseudo-expanded",
+    "display": "cabin",
+    "locale": "en-XA"
+  },
+  {
+    "name": "pseudo-rtl",
+    "display": "cabin",
+    "locale": "ar-XB"
+  },
+  {
+    "name": "uk-units",
+    "display": "driver",
+    "units": "uk"
+  },
+  {
+    "name": "us-units",
+    "display": "cabin",
+    "units": "us"
+  },
+  {
+    "name": "minimum-scale",
+    "display": "driver",
+    "scale": 0.8
+  },
+  {
+    "name": "maximum-scale",
+    "display": "driver",
+    "scale": 1.25
+  },
+  {
+    "name": "minimum-scale",
+    "display": "cabin",
+    "scale": 0.8
+  },
+  {
+    "name": "maximum-scale",
+    "display": "cabin",
+    "scale": 1.25
+  }
+]

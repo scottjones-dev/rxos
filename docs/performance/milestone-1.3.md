@@ -24,3 +24,25 @@ offscreen path.
 
 These observations are not real-time guarantees or automotive benchmarks.
 Milestone 1.2's virtual host benchmark remains documented separately.
+
+## Ubuntu CI observation
+
+Run `30456497740` on 2026-07-29 reported:
+
+| Observation                   |  Driver |   Cabin |
+| ----------------------------- | ------: | ------: |
+| UI ready                      |  132 ms |  143 ms |
+| First frame at 1 Hz           | 1.017 s | 1.039 s |
+| Settled 1 Hz RSS              |   73 MB |   83 MB |
+| Final short 60 Hz RSS         |   74 MB |  194 MB |
+| Final short 60 Hz process CPU |     43% |    100% |
+| Accepted messages             |     243 |     242 |
+| Lagged messages               |       0 |       0 |
+| Presented-frame observation   |     519 |      27 |
+| Active chart samples          |       0 |       0 |
+
+Cooperative shutdown of both displays and the simulator took 1.005 seconds.
+The cabin RSS increase and CPU saturation during this deliberately short
+offscreen 60 Hz phase require an extended observation and profiling before any
+stable performance budget can be proposed. The result is retained as evidence,
+not treated as a pass/fail performance threshold.
