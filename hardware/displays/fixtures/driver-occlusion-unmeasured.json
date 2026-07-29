@@ -9,11 +9,11 @@
   "eyePointPreset": "UNMEASURED",
   "driverHeightPreset": "UNMEASURED",
   "mountingPosition": "UNMEASURED",
-  "criticalRegions": [
-    { "id": "speed", "x": 1040, "y": 210, "width": 480, "height": 260 },
-    { "id": "gear", "x": 1510, "y": 245, "width": 180, "height": 180 },
-    { "id": "rpm", "x": 80, "y": 500, "width": 2400, "height": 150 },
-    { "id": "critical-warning", "x": 80, "y": 50, "width": 700, "height": 150 },
-    { "id": "freshness", "x": 2080, "y": 50, "width": 400, "height": 100 }
-  ]
+  "criticalRegions": {
+    "speed": { "x": 1040, "y": 210, "width": 480, "height": 260 },
+    "gear": { "x": 1510, "y": 245, "width": 180, "height": 180 },
+    "rpm": { "x": 80, "y": 500, "width": 2400, "height": 150 },
+    "critical-warning": { "x": 80, "y": 50, "width": 700, "height": 150 },
+    "freshness": { "x": 2080, "y": 50, "width": 400, "height": 100 }
+  }
 }

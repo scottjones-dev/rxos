@@ -18,11 +18,19 @@ export interface OcclusionInput {
   readonly wheelDiameterMm: number;
   readonly wheelCentreXmm: number;
   readonly wheelCentreYmm: number;
+  readonly eyePointPreset?: string;
+  readonly driverHeightPreset?: string;
+  readonly mountingPosition?: string;
   readonly criticalRegions: Readonly<Record<string, Rectangle>>;
 }
 
 export interface OcclusionReport {
   readonly wheel: Circle;
+  readonly configuration: {
+    readonly eyePointPreset: string;
+    readonly driverHeightPreset: string;
+    readonly mountingPosition: string;
+  };
   readonly regions: readonly {
     readonly name: string;
     readonly rectangle: Rectangle;
@@ -32,6 +40,12 @@ export interface OcclusionReport {
 }
 
 export function createOcclusionReport(input: OcclusionInput): OcclusionReport {
+  if (
+    !input.criticalRegions ||
+    Array.isArray(input.criticalRegions) ||
+    typeof input.criticalRegions !== "object"
+  )
+    throw new Error("Critical regions must be a named object");
   const wheel: Circle = {
     centreX: millimetresToPixels(
       input.wheelCentreXmm,
@@ -52,6 +66,11 @@ export function createOcclusionReport(input: OcclusionInput): OcclusionReport {
   };
   return {
     wheel,
+    configuration: {
+      eyePointPreset: input.eyePointPreset ?? "unmeasured",
+      driverHeightPreset: input.driverHeightPreset ?? "unmeasured",
+      mountingPosition: input.mountingPosition ?? "unmeasured",
+    },
     regions: Object.entries(input.criticalRegions).map(([name, rectangle]) => ({
       name,
       rectangle,

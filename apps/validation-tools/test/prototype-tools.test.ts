@@ -27,6 +27,7 @@ describe("prototype review tools", () => {
     expect(
       report.regions.find((region) => region.name === "speed")?.occluded,
     ).toBe(true);
+    expect(report.regions[0]?.name).toBe("speed");
     expect(svgReviewOverlay("driver", 1920, 720, report)).toContain("<svg");
   });
 
