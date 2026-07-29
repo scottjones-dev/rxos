@@ -28,11 +28,23 @@ add_test(
     COMMAND "${NODE_EXECUTABLE}" "${RXOS_RELIABILITY_RUNNER}"
         "$<TARGET_FILE:rxos-cabin-display>"
 )
+add_test(
+    NAME driver-display-profile
+    COMMAND "$<TARGET_FILE:rxos-driver-display>"
+        --smoke-test --width 2560 --height 720 --scale 1.0 --density 170
+)
+add_test(
+    NAME cabin-display-profile
+    COMMAND "$<TARGET_FILE:rxos-cabin-display>"
+        --smoke-test --width 1920 --height 1080 --scale 1.0 --density 170
+)
 
 set_tests_properties(
     qml-telemetry-state
     driver-display-reliability
     cabin-display-reliability
+    driver-display-profile
+    cabin-display-profile
     PROPERTIES
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QSG_RHI_BACKEND=software"
         RUN_SERIAL TRUE

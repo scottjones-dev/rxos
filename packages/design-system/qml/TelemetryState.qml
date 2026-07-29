@@ -8,6 +8,10 @@ QtObject {
     property bool hasSample: false
     property bool stale: true
     property int invalidMessages: 0
+    property int acceptedMessages: 0
+    property int laggedMessages: 0
+    property int schemaVersion: 0
+    property string source: "none"
     property double capturedAtMs: 0
     property var data: ({
         rpm: 0,
@@ -108,7 +112,10 @@ QtObject {
         }
 
         data = envelope.telemetry
+        schemaVersion = envelope.schemaVersion
+        source = envelope.source
         capturedAtMs = parsedCapturedAt
+        acceptedMessages += 1
         hasSample = true
         stale = false
         observedLive = true

@@ -6,10 +6,12 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "demo": "tsx src/demo-scenario-runner.ts",
     "dev": "tsx src/main.ts",
     "lint": "eslint src test",
     "start": "node dist/src/main.js",
     "test": "vitest run",
+    "performance:observe": "tsx src/performance-observer.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {

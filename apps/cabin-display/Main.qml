@@ -4,218 +4,121 @@ import QtQuick.Layouts
 
 ApplicationWindow {
     id: window
-    width: 1920
-    height: 1080
-    visible: true
-    color: "#070A0F"
-    title: "RXOS Cabin Display"
 
-    property int currentPage: 0
-    readonly property bool reliabilityComplete: telemetry.reliabilityComplete
-    readonly property var pages: ["Navigation", "Media", "Vehicle", "Telemetry", "Diagnostics", "Settings"]
+    DisplayProfiles { id: profile; profile: "cabin" }
+    DisplaySettings { id: settings }
+    RxTokens {
+        id: visualTokens
+        themeName: settings.resolvedTheme()
+        highContrast: settings.highContrast
+        reducedMotion: settings.reducedMotion
+        scale: profile.scale * settings.displayScale
+    }
+    readonly property RxTokens theme: visualTokens
     TelemetryStore { id: telemetry }
+    WarningModel {
+        id: warningModel
+        telemetryWarnings: telemetry.data.warnings
+        timestamp: new Date(telemetry.telemetryState.capturedAtMs).toISOString()
+    }
 
-    RowLayout {
+    width: profile.width
+    height: profile.height
+    visible: true
+    color: theme.background
+    title: "RXOS Cabin Display"
+    readonly property bool reliabilityComplete: telemetry.reliabilityComplete
+    readonly property var applications: ["Home", "Navigation", "Media", "Vehicle", "Performance", "Diagnostics", "Settings"]
+    NavigationState { id: navigation; destinationCount: window.applications.length }
+    readonly property int currentApplication: navigation.currentIndex
+    readonly property var navigationHistory: navigation.history
+
+    function navigate(index) {
+        navigation.navigate(index)
+    }
+
+    function goHome() {
+        navigation.home()
+    }
+
+    function goBack() {
+        navigation.back()
+    }
+
+    Shortcut { sequence: "Escape"; onActivated: window.goBack() }
+    Shortcut { sequence: "Alt+Left"; onActivated: window.goBack() }
+    Shortcut { sequence: "Ctrl+H"; onActivated: window.goHome() }
+
+    ColumnLayout {
         anchors.fill: parent
         spacing: 0
 
         Rectangle {
-            Layout.preferredWidth: 290
-            Layout.fillHeight: true
-            color: "#0C111A"
-            ColumnLayout {
-                anchors { fill: parent; margins: 28 }
-                spacing: 12
-                Text { text: "RXOS"; color: "#38D6FF"; font.pixelSize: 36; font.bold: true; Layout.bottomMargin: 30 }
-                Repeater {
-                    model: window.pages
-                    delegate: Button {
-                        id: pageButton
-                        required property string modelData
-                        required property int index
-                        Layout.fillWidth: true
-                        Layout.preferredHeight: 70
-                        text: pageButton.modelData
-                        highlighted: window.currentPage === pageButton.index
-                        onClicked: window.currentPage = pageButton.index
-                    }
+            Layout.fillWidth: true
+            Layout.preferredHeight: 96 * theme.scale
+            color: theme.surface
+            RowLayout {
+                anchors.fill: parent
+                anchors.leftMargin: theme.safeMargin
+                anchors.rightMargin: theme.safeMargin
+                spacing: theme.space4
+                RxIconButton { theme: window.theme; iconText: "←"; enabled: window.currentApplication !== 0 || window.navigationHistory.length > 0; onClicked: window.goBack() }
+                RxIconButton { theme: window.theme; iconText: "⌂"; onClicked: window.goHome() }
+                RxText {
+                    theme: window.theme
+                    text: window.applications[window.currentApplication]
+                    font.pixelSize: theme.textTitle
+                    font.bold: true
                 }
-                Item { Layout.fillHeight: true }
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 50
-                    radius: 25
-                    color: telemetry.status === "LIVE" ? "#173B32" : "#5A1C28"
-                    Text { anchors.centerIn: parent; text: telemetry.status; color: "white"; font.bold: true }
+                Item { Layout.fillWidth: true }
+                RxText { theme: window.theme; text: "SIMULATED · READ ONLY"; color: theme.textSecondary; font.pixelSize: theme.textCaption }
+                RxStatusChip {
+                    theme: window.theme
+                    text: telemetry.status
+                    severity: telemetry.status === "LIVE" ? "Information" : "Caution"
                 }
             }
         }
 
         StackLayout {
-            currentIndex: window.currentPage
+            currentIndex: window.currentApplication
             Layout.fillWidth: true
             Layout.fillHeight: true
+            CabinHome { theme: window.theme; telemetry: telemetry; settings: settings; warnings: warningModel }
+            CabinPlaceholder { theme: window.theme; title: "Navigation"; message: "Map rendering and route guidance are unavailable in this milestone."; symbol: "↑" }
+            CabinPlaceholder { theme: window.theme; title: "Media"; message: "No media provider is connected. Playback controls are visual placeholders."; symbol: "♪" }
+            CabinVehicle { theme: window.theme; telemetry: telemetry }
+            CabinPerformance { theme: window.theme; telemetry: telemetry }
+            CabinDiagnostics { theme: window.theme; telemetry: telemetry }
+            CabinSettings { theme: window.theme; settings: settings }
+        }
 
-            PagePanel {
-                heading: "Navigation"
-                subtitle: "Map and routing provider placeholder"
-                Rectangle {
-                    anchors { fill: parent; margins: 80 }
-                    radius: 24; color: "#111722"; border.color: "#202B3D"
-                    Text { anchors.centerIn: parent; text: "MAP\n\nContinue on simulated route  •  450 m"; horizontalAlignment: Text.AlignHCenter; color: "#F4F7FB"; font.pixelSize: 34 }
-                }
-            }
-            PagePanel {
-                heading: "Media"
-                subtitle: "Local media session placeholder"
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 50
-                    Rectangle {
-                        width: 330
-                        height: 330
-                        radius: 24
-                        color: "#202B3D"
-                        Text {
-                            anchors.centerIn: parent
-                            text: "ALBUM\nART"
-                            color: "#8C9AAF"
-                            font.pixelSize: 40
-                            horizontalAlignment: Text.AlignHCenter
-                        }
-                    }
-                    Column {
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 24
-                        Text {
-                            text: "No media playing"
-                            color: "#F4F7FB"
-                            font.pixelSize: 46
-                            font.bold: true
-                        }
-                        Text {
-                            text: "Bluetooth and audio integration arrive in a later phase"
-                            color: "#8C9AAF"
-                            font.pixelSize: 24
-                        }
-                        Row {
-                            spacing: 20
-                            Button { text: "◀" }
-                            Button { text: "▶" }
-                            Button { text: "▶▶" }
-                        }
-                    }
-                }
-            }
-            PagePanel {
-                heading: "Vehicle overview"
-                subtitle: "Shared live telemetry"
-                Grid {
-                    anchors.centerIn: parent; columns: 3; spacing: 22
-                    Repeater {
-                        model: [["SPEED", Math.round(telemetry.data.speedKph) + " km/h"], ["ENGINE", Math.round(telemetry.data.rpm) + " rpm"], ["GEAR", telemetry.data.gear], ["FUEL", Math.round(telemetry.data.fuelPercent) + "%"], ["COOLANT", Math.round(telemetry.data.coolantTempC) + "°C"], ["BATTERY", telemetry.data.batteryVoltage.toFixed(1) + " V"]]
-                        delegate: MetricCard {
-                            id: overviewMetric
-                            required property var modelData
-                            label: overviewMetric.modelData[0]
-                            value: overviewMetric.modelData[1]
-                        }
-                    }
-                }
-            }
-            PagePanel {
-                heading: "Telemetry"
-                subtitle: "Simulator source • 10 Hz target"
-                Grid {
-                    anchors.centerIn: parent; columns: 3; spacing: 22
-                    Repeater {
-                        model: [["RPM", Math.round(telemetry.data.rpm)], ["SPEED", telemetry.data.speedKph.toFixed(1) + " km/h"], ["THROTTLE", telemetry.data.throttlePercent.toFixed(1) + "%"], ["COOLANT", telemetry.data.coolantTempC.toFixed(1) + "°C"], ["OIL TEMP", telemetry.data.oilTempC.toFixed(1) + "°C"], ["OIL PRESS", Math.round(telemetry.data.oilPressureKpa) + " kPa"], ["FUEL", telemetry.data.fuelPercent.toFixed(1) + "%"], ["BATTERY", telemetry.data.batteryVoltage.toFixed(2) + " V"], ["GEAR", telemetry.data.gear]]
-                        delegate: MetricCard {
-                            id: telemetryMetric
-                            required property var modelData
-                            label: telemetryMetric.modelData[0]
-                            value: telemetryMetric.modelData[1]
-                        }
-                    }
-                }
-            }
-            PagePanel {
-                heading: "Diagnostics"
-                subtitle: "Display-only simulated status; not a factory diagnostic tool"
-                Column {
-                    anchors.centerIn: parent; spacing: 20
-                    Repeater {
-                        model: [["Check engine", telemetry.data.warnings.checkEngine], ["Coolant temperature", telemetry.data.warnings.coolantTemperature], ["Low fuel", telemetry.data.warnings.lowFuel], ["Low oil pressure", telemetry.data.warnings.lowOilPressure]]
-                        delegate: Rectangle {
-                            id: diagnosticDelegate
-                            required property var modelData
-                            width: 900
-                            height: 90
-                            radius: 16
-                            color: "#111722"
-                            border.color: diagnosticDelegate.modelData[1] ? "#FF4057" : "#202B3D"
-                            RowLayout {
-                                anchors {
-                                    fill: parent
-                                    margins: 24
-                                }
-                                Text {
-                                    text: diagnosticDelegate.modelData[0]
-                                    color: "#F4F7FB"
-                                    font.pixelSize: 28
-                                    Layout.fillWidth: true
-                                }
-                                Text {
-                                    text: diagnosticDelegate.modelData[1] ? "SIMULATED WARNING" : "OK"
-                                    color: diagnosticDelegate.modelData[1] ? "#FF4057" : "#43E09D"
-                                    font.bold: true
-                                    font.pixelSize: 22
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            PagePanel {
-                heading: "Settings"
-                subtitle: "Desktop milestone settings are local UI placeholders"
-                Column {
-                    anchors.centerIn: parent; spacing: 26
-                    Switch { text: "Metric units"; checked: true }
-                    Switch { text: "High contrast instruments"; checked: true }
-                    Switch { text: "Share simulated diagnostics"; checked: false }
-                    Text { text: "Driver profile: Development"; color: "#F4F7FB"; font.pixelSize: 28 }
-                    Text { text: "OTA updates are not configured"; color: "#8C9AAF"; font.pixelSize: 22 }
-                }
-            }
+        RxNavigationRail {
+            Layout.fillWidth: true
+            Layout.preferredHeight: 108 * theme.scale
+            Layout.leftMargin: theme.space4
+            Layout.rightMargin: theme.space4
+            Layout.bottomMargin: theme.space4
+            theme: window.theme
+            destinations: window.applications
+            currentIndex: window.currentApplication
+            vertical: false
+            onActivated: index => window.navigate(index)
         }
     }
 
-    component PagePanel: Item {
-        property string heading
-        property string subtitle
-        Column {
-            anchors { top: parent.top; left: parent.left; margins: 48 }
-            Text { text: heading; color: "#F4F7FB"; font.pixelSize: 44; font.bold: true }
-            Text { text: subtitle; color: "#8C9AAF"; font.pixelSize: 22 }
+    RxWarningBanner {
+        anchors {
+            top: parent.top
+            topMargin: 108 * theme.scale
+            horizontalCenter: parent.horizontalCenter
         }
-    }
-
-    component MetricCard: Rectangle {
-        property string label
-        property var value
-        width: 360; height: 170; radius: 18; color: "#111722"; border.color: "#202B3D"
-        Column {
-            anchors.centerIn: parent; spacing: 14
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: label; color: "#8C9AAF"; font.pixelSize: 18; font.letterSpacing: 2 }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: value; color: "#F4F7FB"; font.pixelSize: 38; font.bold: true }
-        }
-    }
-
-    Rectangle {
-        visible: telemetry.status !== "LIVE"
-        anchors { top: parent.top; right: parent.right; margins: 24 }
-        width: 420; height: 64; radius: 12; color: "#5A1C28"; z: 10
-        Text { anchors.centerIn: parent; text: telemetry.status + " — VALUES NOT AUTHORITATIVE"; color: "white"; font.bold: true }
+        width: Math.min(parent.width - theme.safeMargin * 2, 1100 * theme.scale)
+        z: 100
+        visible: warningModel.activeWarnings.length > 0 && telemetry.status === "LIVE"
+        theme: window.theme
+        severity: warningModel.mostSevere.severity
+        title: warningModel.mostSevere.title + " · SIMULATED"
+        message: warningModel.mostSevere.message
     }
 }

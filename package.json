@@ -6,6 +6,7 @@
   "scripts": {
     "build": "turbo run build",
     "clean": "turbo run clean",
+    "demo": "pnpm --filter @rxos/vehicle-simulator demo",
     "dev": "turbo run dev --parallel",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
@@ -15,6 +16,7 @@
     "native:lint": "cargo clippy --workspace --all-targets --all-features -- -D warnings",
     "native:test": "cargo test --workspace --all-features",
     "native:verify": "pnpm native:format:check && pnpm native:lint && pnpm native:test",
+    "performance:observe": "pnpm --filter @rxos/vehicle-simulator performance:observe",
     "qt:build": "cmake --build build/native --parallel",
     "qt:configure": "cmake -S . -B build/native -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON",
     "qt:lint": "cmake --build build/native --target all_qmllint",

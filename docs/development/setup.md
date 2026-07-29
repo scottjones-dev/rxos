@@ -135,6 +135,20 @@ pnpm qt:build
 pnpm qt:test
 ```
 
+Display development profiles can be overridden when launching either native
+binary:
+
+```text
+--width 2560 --height 720 --scale 1.0 --density 170
+```
+
+The driver display also accepts `--demo-cycle` for deterministic Daily,
+Performance, and Track cycling. Run `pnpm demo` in another terminal for the
+normal, high-RPM, warning, stale, disconnect, and recovery scenario.
+
+`pnpm performance:observe` runs the host-side virtual ten-minute 60 Hz
+processing and bounded-history observation. It is not a real-time benchmark.
+
 Run the complete repository sequence with:
 
 ```bash

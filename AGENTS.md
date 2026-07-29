@@ -38,6 +38,13 @@ review gate in `docs/safety/safety-boundaries.md`.
   testable library functions.
 - QML must keep safety and freshness states visible. Aesthetic animation must
   not conceal missing data.
+- QML pages use `RxTokens` roles and reusable `Rx*` primitives. Do not add
+  arbitrary colours, touch sizes, spacing, or motion when a token applies.
+- Driver UI is non-touch. Cabin controls preserve the scaled 56×56 minimum,
+  visible focus, Escape/Back semantics, and rotary-compatible traversal.
+- Warning severity is presentation-only. Do not add Mazda thresholds or make
+  acknowledgement imply that a condition was resolved.
+- Chart and navigation histories must be explicitly bounded.
 - Shared display telemetry parsing belongs in
   `packages/design-system/qml`; do not fork driver and cabin validators.
 - Native C++ uses C++20, Qt ownership, bounded test timeouts, and structured
@@ -60,6 +67,8 @@ pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm demo
+pnpm performance:observe
 pnpm verify:node
 
 pnpm native:format
@@ -103,3 +112,8 @@ rxos-vehicle-gateway`, with the same playback flag.
     each complete binary against the controlled WebSocket scenario.
 13. Clearly report native commands that did not run because a local toolchain
     is unavailable; authored CI coverage is not a local pass.
+14. Run both profile smoke tests and the deterministic reliability scenario
+    after changing display composition or shared controls.
+15. Treat daylight/night readability, distraction, touch reach, and physical
+    display scaling as human-review items until checked on representative
+    hardware.

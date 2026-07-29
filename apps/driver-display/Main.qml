@@ -4,238 +4,134 @@ import QtQuick.Layouts
 
 ApplicationWindow {
     id: window
-    width: 1920
-    height: 1080
-    visible: true
-    color: "#070A0F"
-    title: "RXOS Driver Display"
 
-    property bool trackMode: false
-    readonly property bool reliabilityComplete: telemetry.reliabilityComplete
+    DisplayProfiles { id: profile; profile: "driver" }
+    DisplaySettings { id: settings }
+    DriverModeState { id: modeState; mode: settings.driverMode }
+    RxTokens {
+        id: visualTokens
+        themeName: settings.resolvedTheme()
+        highContrast: settings.highContrast
+        reducedMotion: settings.reducedMotion
+        scale: profile.scale * settings.displayScale
+    }
+    readonly property RxTokens theme: visualTokens
     TelemetryStore { id: telemetry }
+    WarningModel {
+        id: warningModel
+        telemetryWarnings: telemetry.data.warnings
+        timestamp: new Date(telemetry.telemetryState.capturedAtMs).toISOString()
+    }
 
-    Rectangle {
+    width: profile.width
+    height: profile.height
+    visible: true
+    color: theme.background
+    title: "RXOS Driver Display"
+    readonly property bool reliabilityComplete: telemetry.reliabilityComplete
+    readonly property bool live: telemetry.status === "LIVE"
+    readonly property string currentMode: settings.driverMode
+
+    function setMode(mode) {
+        if (modeState.select(mode))
+            settings.driverMode = mode
+    }
+
+    Timer {
+        property int demoIndex: 0
+        interval: 1600
+        repeat: true
+        running: Qt.application.arguments.includes("--demo-cycle")
+        onTriggered: {
+            demoIndex = (demoIndex + 1) % modeState.modes.length
+            window.setMode(modeState.modes[demoIndex])
+        }
+    }
+
+    Shortcut { sequence: "1"; onActivated: window.setMode("Daily") }
+    Shortcut { sequence: "2"; onActivated: window.setMode("Performance") }
+    Shortcut { sequence: "3"; onActivated: window.setMode("Track") }
+
+    ColumnLayout {
         anchors.fill: parent
-        color: "#070A0F"
+        anchors.margins: theme.safeMargin
+        spacing: theme.space4
 
         RowLayout {
-            anchors {
-                fill: parent
-                margins: 48
+            Layout.fillWidth: true
+            Layout.preferredHeight: 44 * theme.scale
+            spacing: theme.space4
+            RxText {
+                theme: window.theme
+                text: "RXOS"
+                color: theme.accent
+                font.pixelSize: theme.textTitle
+                font.bold: true
             }
-            spacing: 36
-
-            ColumnLayout {
-                Layout.preferredWidth: 420
-                Layout.fillHeight: true
-                spacing: 24
-
-                Text {
-                    text: "RXOS  /  " + (window.trackMode ? "TRACK" : "DAILY")
-                    color: "#38D6FF"
-                    font.pixelSize: 24
-                    font.bold: true
-                    font.letterSpacing: 3
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 250
-                    radius: 20
-                    color: "#111722"
-                    border.color: "#202B3D"
-                    Column {
-                        anchors.centerIn: parent
-                        spacing: 2
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: telemetry.hasSample ? Math.round(telemetry.speedKph) : "—"
-                            color: "#F4F7FB"
-                            font.pixelSize: 126
-                            font.bold: true
-                        }
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: "km/h"
-                            color: "#8C9AAF"
-                            font.pixelSize: 25
-                        }
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 220
-                    radius: 20
-                    color: "#111722"
-                    border.color: "#202B3D"
-                    Row {
-                        anchors.centerIn: parent
-                        spacing: 56
-                        Column {
-                            Text { text: "GEAR"; color: "#8C9AAF"; font.pixelSize: 20 }
-                            Text { text: telemetry.gear; color: "#38D6FF"; font.pixelSize: 100; font.bold: true }
-                        }
-                        Column {
-                            Text { text: "THROTTLE"; color: "#8C9AAF"; font.pixelSize: 20 }
-                            Text { text: Math.round(telemetry.throttlePercent) + "%"; color: "#F4F7FB"; font.pixelSize: 52 }
-                        }
-                    }
-                }
-
-                Item { Layout.fillHeight: true }
-                Button {
-                    text: window.trackMode ? "Switch to Daily" : "Switch to Track"
-                    onClicked: window.trackMode = !window.trackMode
-                }
+            RxStatusChip {
+                theme: window.theme
+                text: window.currentMode.toUpperCase()
+                severity: "Information"
             }
-
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                spacing: 24
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: 470
-                    radius: 26
-                    color: "#0C111A"
-                    border.color: telemetry.rpm >= 8000 ? "#FF4057" : "#202B3D"
-
-                    Canvas {
-                        id: tachometer
-                        anchors.fill: parent
-                        onPaint: {
-                            const context = getContext("2d")
-                            context.reset()
-                            const cx = width / 2
-                            const cy = height * 0.9
-                            const radius = Math.min(width * 0.42, height * 0.78)
-                            const start = Math.PI * 1.1
-                            const span = Math.PI * 0.8
-                            context.lineWidth = 28
-                            context.strokeStyle = "#202B3D"
-                            context.beginPath()
-                            context.arc(cx, cy, radius, start, start + span)
-                            context.stroke()
-                            context.strokeStyle = telemetry.rpm >= 8000 ? "#FF4057" : "#38D6FF"
-                            context.beginPath()
-                            context.arc(cx, cy, radius, start, start + span * Math.min(telemetry.rpm / 9000, 1))
-                            context.stroke()
-                        }
-                        Connections {
-                            target: telemetry
-                            function onRpmChanged() { tachometer.requestPaint() }
-                        }
-                    }
-                    Column {
-                        anchors.centerIn: parent
-                        anchors.verticalCenterOffset: 35
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: Math.round(telemetry.rpm)
-                            color: telemetry.rpm >= 8000 ? "#FF4057" : "#F4F7FB"
-                            font.pixelSize: 105
-                            font.bold: true
-                        }
-                        Text {
-                            anchors.horizontalCenter: parent.horizontalCenter
-                            text: "RPM   •   REDLINE 9,000"
-                            color: "#8C9AAF"
-                            font.pixelSize: 22
-                        }
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: window.trackMode ? 260 : 190
-                    radius: 20
-                    color: "#111722"
-                    border.color: "#202B3D"
-                    RowLayout {
-                        anchors { fill: parent; margins: 30 }
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            Text { text: window.trackMode ? "TRACK TELEMETRY" : "NAVIGATION"; color: "#38D6FF"; font.pixelSize: 20; font.bold: true }
-                            Text { text: window.trackMode ? "Lap timer armed" : "Continue on simulated route"; color: "#F4F7FB"; font.pixelSize: 34 }
-                            Text { text: window.trackMode ? "No GPS/IMU source connected" : "Next instruction  —  450 m"; color: "#8C9AAF"; font.pixelSize: 22 }
-                        }
-                        Text { text: window.trackMode ? "00:00.000" : "↑"; color: "#F4F7FB"; font.pixelSize: 64; font.bold: true }
-                    }
-                }
-
-                RowLayout {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Repeater {
-                        model: [
-                            ["COOLANT", Math.round(telemetry.coolantTempC) + "°C"],
-                            ["OIL TEMP", Math.round(telemetry.oilTempC) + "°C"],
-                            ["OIL PRESS", Math.round(telemetry.oilPressureKpa) + " kPa"],
-                            ["FUEL", Math.round(telemetry.fuelPercent) + "%"],
-                            ["BATTERY", telemetry.batteryVoltage.toFixed(1) + " V"]
-                        ]
-                        delegate: Rectangle {
-                            id: metricDelegate
-                            required property var modelData
-                            Layout.fillWidth: true
-                            Layout.fillHeight: true
-                            radius: 15
-                            color: "#111722"
-                            Column {
-                                anchors.centerIn: parent
-                                spacing: 12
-                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: metricDelegate.modelData[0]; color: "#8C9AAF"; font.pixelSize: 16 }
-                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: metricDelegate.modelData[1]; color: "#F4F7FB"; font.pixelSize: 27; font.bold: true }
-                            }
-                        }
-                    }
-                }
+            Item { Layout.fillWidth: true }
+            RxText {
+                theme: window.theme
+                text: "SIMULATED · SECONDARY DISPLAY"
+                color: theme.textSecondary
+                font.pixelSize: theme.textCaption
+            }
+            RxStatusChip {
+                theme: window.theme
+                text: telemetry.status
+                severity: window.live ? "Information" : "Caution"
             }
         }
 
-        Row {
-            anchors { top: parent.top; right: parent.right; margins: 22 }
-            spacing: 10
-            Repeater {
-                model: [
-                    ["ENGINE", telemetry.checkEngineWarning],
-                    ["COOLANT", telemetry.coolantWarning],
-                    ["FUEL", telemetry.lowFuelWarning],
-                    ["OIL", telemetry.lowOilPressureWarning]
-                ]
-                delegate: Rectangle {
-                    id: warningDelegate
-                    required property var modelData
-                    visible: warningDelegate.modelData[1]
-                    width: 118
-                    height: 38
-                    radius: 8
-                    color: "#FF4057"
-                    Text { anchors.centerIn: parent; text: warningDelegate.modelData[0]; color: "white"; font.bold: true }
-                }
+        Item {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            DriverDaily {
+                anchors.fill: parent
+                visible: window.currentMode === "Daily"
+                theme: window.theme
+                telemetry: telemetry
+                live: window.live
             }
-            Rectangle {
-                width: 120
-                height: 38
-                radius: 19
-                color: telemetry.status === "LIVE" ? "#173B32" : "#5A1C28"
-                Text { anchors.centerIn: parent; text: telemetry.status; color: telemetry.status === "LIVE" ? "#43E09D" : "#FFFFFF"; font.bold: true }
+            DriverPerformance {
+                anchors.fill: parent
+                visible: window.currentMode === "Performance"
+                theme: window.theme
+                telemetry: telemetry
+                live: window.live
+            }
+            DriverTrack {
+                anchors.fill: parent
+                visible: window.currentMode === "Track"
+                theme: window.theme
+                telemetry: telemetry
+                live: window.live
             }
         }
 
-        Rectangle {
-            visible: telemetry.status !== "LIVE"
-            anchors.fill: parent
-            color: "#99070A0F"
-            z: 10
-            Column {
-                anchors.centerIn: parent
-                spacing: 18
-                Text { anchors.horizontalCenter: parent.horizontalCenter; text: telemetry.status; color: "#FF4057"; font.pixelSize: 76; font.bold: true }
-                Text { text: "Telemetry is unavailable. Values are not authoritative."; color: "#F4F7FB"; font.pixelSize: 26 }
-            }
+        RxWarningBanner {
+            Layout.fillWidth: true
+            visible: warningModel.activeWarnings.length > 0 && window.live
+            theme: window.theme
+            severity: warningModel.mostSevere.severity
+            title: warningModel.mostSevere.title + " · SIMULATED"
+            message: warningModel.mostSevere.message
+        }
+
+        RxWarningBanner {
+            Layout.fillWidth: true
+            visible: !window.live
+            theme: window.theme
+            severity: "Caution"
+            title: telemetry.status === "STALE"
+                ? "Telemetry stale"
+                : "Telemetry unavailable"
+            message: "Live values are withheld. Use the vehicle's factory instruments."
         }
     }
 }

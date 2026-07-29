@@ -1,8 +1,8 @@
 # RXOS
 
 RXOS is an experimental dual-screen infotainment and instrument-cluster
-platform for a Mazda RX-8. This repository currently contains milestone one: a
-desktop simulator and display prototype.
+platform for a Mazda RX-8. This repository currently contains a desktop
+simulator and the milestone 1.2 dual-display visual foundation.
 
 > RXOS is read-only and is not a certified vehicle instrument. Milestone one
 > must not be connected to a vehicle or used to control any vehicle system.
@@ -16,9 +16,12 @@ desktop simulator and display prototype.
 - Rust and TypeScript simulator/gateway implementations using the same JSON
   contract.
 - Recorded NDJSON playback.
-- Qt/QML driver display with Daily and Track layouts.
-- Qt/QML cabin display with navigation, media, vehicle, telemetry, diagnostics
-  and settings pages.
+- Qt/QML driver display with Daily, Performance, Track, and reduced-data
+  presentation.
+- Qt/QML cabin shell with Home, Navigation, Media, Vehicle, Performance,
+  Diagnostics, and Settings applications.
+- Shared day/night design tokens, reusable controls, configurable logical
+  profiles, keyboard/rotary-style focus support, and bounded telemetry charts.
 - Browser developer console for inspecting the stream.
 - Loss-of-data and stale-data presentation.
 - TypeScript unit/integration tests and Rust provider/contract tests.
@@ -53,6 +56,11 @@ Complete verification, including Rust and Qt:
 ```bash
 pnpm verify
 ```
+
+Run the deterministic milestone 1.2 scenario server with `pnpm demo`. Launch
+the driver display with `--demo-cycle` to cycle Daily, Performance, and Track
+during the scenario. Profile overrides use `--width`, `--height`, `--scale`,
+and `--density`.
 
 ## Repository map
 

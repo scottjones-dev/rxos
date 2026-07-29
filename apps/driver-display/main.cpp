@@ -1,3 +1,4 @@
+#include <QElapsedTimer>
 #include <QGuiApplication>
 #include <QLoggingCategory>
 #include <QQmlApplicationEngine>
@@ -9,13 +10,22 @@ int main(int argc, char *argv[])
     application.setApplicationName(QStringLiteral("RXOS Driver Display"));
     qInfo().noquote() << R"({"component":"driver-display","event":"startup"})";
 
+    QElapsedTimer startupTimer;
+    startupTimer.start();
     QQmlApplicationEngine engine;
     engine.loadFromModule("Rxos.DriverDisplay", "Main");
     if (engine.rootObjects().isEmpty())
         return -1;
+    qInfo().noquote() << QStringLiteral(
+        R"({"component":"driver-display","event":"ui_ready","startupMs":%1})")
+                             .arg(startupTimer.elapsed());
 
     const bool reliabilityTest =
         application.arguments().contains(QStringLiteral("--reliability-test"));
+    const bool smokeTest =
+        application.arguments().contains(QStringLiteral("--smoke-test"));
+    if (smokeTest)
+        QTimer::singleShot(250, &application, [&application]() { application.exit(0); });
     QTimer poll;
     QTimer timeout;
     if (reliabilityTest) {
