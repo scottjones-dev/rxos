@@ -10,6 +10,7 @@ QtObject {
 
     readonly property bool imperialDistance: unitsProfile === "uk" || unitsProfile === "us"
     readonly property bool fahrenheit: unitsProfile === "us"
+    readonly property string speedUnit: imperialDistance ? "mph" : "km/h"
 
     function numeric(value, decimals) {
         if (value === null || value === undefined || !isFinite(value))
@@ -25,8 +26,15 @@ QtObject {
     }
 
     function speed(kph, state) {
-        const value = imperialDistance && kph !== null ? kph * 0.621371192 : kph
-        return valueWithUnit(value, imperialDistance ? "mph" : "km/h", 0, state)
+        if (kph === null || kph === undefined || !isFinite(kph))
+            return valueWithUnit(kph, speedUnit, 0, state)
+        return valueWithUnit(speedValue(kph), speedUnit, 0, state)
+    }
+
+    function speedValue(kph) {
+        if (kph === null || kph === undefined || !isFinite(kph))
+            return 0
+        return imperialDistance ? kph * 0.621371192 : kph
     }
 
     function distance(kilometres, state) {

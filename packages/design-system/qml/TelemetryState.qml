@@ -121,7 +121,7 @@ QtObject {
         hasSample = true
         stale = false
         observedLive = true
-        if (observedDisconnected) {
+        if (observedDisconnected && !observedReconnect) {
             observedReconnect = true
             log("client_reconnected", {})
         }

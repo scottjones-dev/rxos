@@ -28,6 +28,7 @@ target_link_libraries(rxos-design-system
 )
 
 qt_add_translations(rxos-design-system
+    LRELEASE_OPTIONS -idbased
     TS_FILES
         translations/rxos_en_GB.ts
         translations/rxos_de_DE.ts

@@ -9,11 +9,12 @@ Item {
     required property PresentationFormatter formatter
     readonly property bool live: telemetry.status === "LIVE"
     readonly property int sampleCount: rpmHistory.length
-    BoundedHistory { id: rpmHistory; capacity: 600; downsampleEvery: 1 }
+    BoundedHistory { id: rpmHistory; capacity: 600; downsampleEvery: 6 }
     Connections {
         target: performance.telemetry.telemetryState
         function onDataChanged() {
-            rpmHistory.append(Date.now(), performance.telemetry.rpm, performance.live)
+            if (performance.visible)
+                rpmHistory.append(Date.now(), performance.telemetry.rpm, performance.live)
         }
     }
     ColumnLayout {

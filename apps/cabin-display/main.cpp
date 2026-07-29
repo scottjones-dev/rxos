@@ -8,8 +8,16 @@
 #include <QQuickWindow>
 #include <QTimer>
 #include <QTranslator>
+#include <csignal>
 
 namespace {
+volatile std::sig_atomic_t shutdownRequested = 0;
+
+void requestShutdown(int)
+{
+    shutdownRequested = 1;
+}
+
 QString optionValue(const QStringList &arguments, const QString &name)
 {
     const qsizetype index = arguments.indexOf(name);
@@ -22,6 +30,8 @@ int main(int argc, char *argv[])
     QGuiApplication application(argc, argv);
     application.setApplicationName(QStringLiteral("RXOS Cabin Display"));
     application.setFont(QFont(QStringLiteral("Noto Sans")));
+    std::signal(SIGINT, requestShutdown);
+    std::signal(SIGTERM, requestShutdown);
     const QStringList arguments = application.arguments();
     QString localeName = optionValue(arguments, QStringLiteral("--locale"));
     if (localeName.isEmpty())
@@ -59,6 +69,13 @@ int main(int argc, char *argv[])
         QTimer::singleShot(250, &application, [&application]() { application.exit(0); });
     QTimer poll;
     QTimer timeout;
+    QTimer signalPoll;
+    signalPoll.setInterval(50);
+    QObject::connect(&signalPoll, &QTimer::timeout, &application, [&application]() {
+        if (shutdownRequested != 0)
+            application.quit();
+    });
+    signalPoll.start();
     QTimer telemetryInstrumentation;
     telemetryInstrumentation.setInterval(25);
     QObject::connect(&telemetryInstrumentation, &QTimer::timeout, &application,

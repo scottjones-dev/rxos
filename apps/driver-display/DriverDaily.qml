@@ -37,8 +37,8 @@ Item {
                     Layout.fillWidth: true
                     theme: daily.theme
                     label: "SPEED"
-                    unit: ""
-                    value: daily.formatter.speed(daily.telemetry.speedKph, daily.live ? "live" : "missing")
+                    unit: daily.formatter.speedUnit
+                    value: daily.formatter.speedValue(daily.telemetry.speedKph)
                     maximum: 300
                     available: daily.live
                 }
