@@ -281,7 +281,10 @@ impl TelemetryProvider for PlaybackProvider {
 
 impl Drop for PlaybackProvider {
     fn drop(&mut self) {
-        structured_log("playback_finish", &json!({ "samplesPlayed": self.sequence }));
+        structured_log(
+            "playback_finish",
+            &json!({ "samplesPlayed": self.sequence }),
+        );
     }
 }
 

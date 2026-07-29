@@ -79,4 +79,6 @@ jobs:
       - run: pnpm qt:configure
       - run: pnpm qt:lint
       - run: pnpm qt:build
+      - name: Build display reliability runner and dependencies
+        run: pnpm --filter @rxos/vehicle-simulator... build
       - run: pnpm qt:test
