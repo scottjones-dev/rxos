@@ -22,6 +22,8 @@ ApplicationWindow {
         scale: profile.scale * settings.displayScale
     }
     readonly property RxTokens theme: visualTokens
+    readonly property DisplaySettings appSettings: settings
+    readonly property PresentationFormatter appFormatter: formatter
     TelemetryStore {
         id: telemetry
         endpoint: profile.option("--telemetry-endpoint") || "ws://127.0.0.1:8787/telemetry"
@@ -32,6 +34,8 @@ ApplicationWindow {
         source: telemetry
         maximumHz: Number(profile.option("--presentation-hz") || 30)
     }
+    readonly property TelemetryStore rawTelemetry: telemetry
+    readonly property PresentationTelemetry displayTelemetry: presentationTelemetry
     BoundedHistory {
         id: rpmHistory
         capacity: 600
@@ -53,6 +57,7 @@ ApplicationWindow {
         telemetryWarnings: telemetry.data.warnings
         timestamp: new Date(telemetry.telemetryState.capturedAtMs).toISOString()
     }
+    readonly property WarningModel appWarnings: warningModel
 
     width: profile.width
     height: profile.height
@@ -187,10 +192,10 @@ ApplicationWindow {
                 active: window.currentApplication === 0
                 sourceComponent: CabinHome {
                     theme: window.theme
-                    telemetry: presentationTelemetry
-                    formatter: formatter
-                    settings: settings
-                    warnings: warningModel
+                    telemetry: window.displayTelemetry
+                    formatter: window.appFormatter
+                    settings: window.appSettings
+                    warnings: window.appWarnings
                 }
             }
             Loader {
@@ -218,7 +223,7 @@ ApplicationWindow {
                 active: window.currentApplication === 3
                 sourceComponent: CabinVehicle {
                     theme: window.theme
-                    telemetry: presentationTelemetry
+                    telemetry: window.displayTelemetry
                 }
             }
             Loader {
@@ -226,8 +231,8 @@ ApplicationWindow {
                 active: window.currentApplication === 4
                 sourceComponent: CabinPerformance {
                     theme: window.theme
-                    telemetry: presentationTelemetry
-                    formatter: formatter
+                    telemetry: window.displayTelemetry
+                    formatter: window.appFormatter
                     history: rpmHistory
                 }
             }
@@ -236,7 +241,7 @@ ApplicationWindow {
                 active: window.currentApplication === 5
                 sourceComponent: CabinDiagnostics {
                     theme: window.theme
-                    telemetry: telemetry
+                    telemetry: window.rawTelemetry
                 }
             }
             Loader {
@@ -244,7 +249,7 @@ ApplicationWindow {
                 active: window.currentApplication === 6
                 sourceComponent: CabinSettings {
                     theme: window.theme
-                    settings: settings
+                    settings: window.appSettings
                 }
             }
         }
