@@ -88,6 +88,9 @@ ApplicationWindow {
     readonly property bool live: telemetry.status === "LIVE"
     property int profileEventSequence: 0
     property string profileEventName: "qml-ready"
+    readonly property string profileWarningSignature:
+        warningModel.activeWarnings.map(item => item.identifier).join(",")
+    onProfileWarningSignatureChanged: markProfileEvent("warning-overlay")
     readonly property string currentMode: settings.driverMode
     VisualScenario {
         id: visualScenario
@@ -121,11 +124,6 @@ ApplicationWindow {
         target: settings
         function onThemeSelectionChanged() { window.markProfileEvent("theme-change") }
     }
-    Connections {
-        target: warningModel
-        function onActiveWarningsChanged() { window.markProfileEvent("warning-overlay") }
-    }
-
     Component.onCompleted: {
         brightness.updateAmbient(brightness.ambientLevel)
         if (requestedProfileScenario === "performance")

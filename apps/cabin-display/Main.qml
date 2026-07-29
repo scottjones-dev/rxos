@@ -130,6 +130,9 @@ ApplicationWindow {
     readonly property int hiddenWorkCount: Math.max(0, loadedPageCount - 1)
     property int profileEventSequence: 0
     property string profileEventName: "qml-ready"
+    readonly property string profileWarningSignature:
+        warningModel.activeWarnings.map(item => item.identifier).join(",")
+    onProfileWarningSignatureChanged: markProfileEvent("warning-overlay")
     readonly property string requestedScenario: profile.option("--visual-scenario") || ""
     readonly property string requestedProfileScenario: profile.option("--profile-scenario") || "home"
     readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
@@ -182,11 +185,6 @@ ApplicationWindow {
         target: settings
         function onThemeSelectionChanged() { window.markProfileEvent("theme-change") }
     }
-    Connections {
-        target: warningModel
-        function onActiveWarningsChanged() { window.markProfileEvent("warning-overlay") }
-    }
-
     function goHome() {
         navigation.home()
     }
