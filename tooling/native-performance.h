@@ -23,8 +23,10 @@ public:
         }
         const qint64 intervalUs = timer_.nsecsElapsed() / 1'000;
         timer_.restart();
-        if (intervalUs > 16'700 && !currentEvent_.isEmpty())
+        if (intervalUs > 16'700 && remainingEventFrames_ > 0 && !currentEvent_.isEmpty())
             ++correlatedLongFrames_[currentEvent_];
+        if (remainingEventFrames_ > 0)
+            --remainingEventFrames_;
         if (intervalsUs_.size() < MaximumIntervals) {
             intervalsUs_.append(intervalUs);
         } else {
@@ -36,7 +38,11 @@ public:
 
     [[nodiscard]] quint64 frameCount() const { return frameCount_; }
 
-    void markEvent(const QString &event) { currentEvent_ = event.left(80); }
+    void markEvent(const QString &event)
+    {
+        currentEvent_ = event.left(80);
+        remainingEventFrames_ = EventCorrelationWindowFrames;
+    }
 
     [[nodiscard]] QString summary(const QString &component) const
     {
@@ -79,6 +85,8 @@ private:
     quint64 frameCount_ = 0;
     quint64 overwrittenIntervals_ = 0;
     QString currentEvent_ = QStringLiteral("startup");
+    static constexpr int EventCorrelationWindowFrames = 8;
+    int remainingEventFrames_ = EventCorrelationWindowFrames;
     QHash<QString, quint64> correlatedLongFrames_;
 
     [[nodiscard]] QString correlationJson() const

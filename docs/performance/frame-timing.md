@@ -7,8 +7,9 @@ buffer. Shutdown logs contain:
 - total frames and retained/overwritten intervals;
 - median, p95, p99 and maximum interval in milliseconds;
 - interval counts above 16.7, 33.3, 50 and 100 milliseconds.
-- bounded counts of long frames correlated with the latest UI event marker,
-  including page transitions, chart refresh, mode/theme changes and warnings.
+- bounded counts of long frames within the next eight swaps after a UI event
+  marker, including page transitions, chart refresh, mode/theme changes and
+  warnings.
 
 This instrumentation is intentionally low cost: one monotonic timer read and
 one bounded vector write per swap. Sorting occurs only during shutdown.
