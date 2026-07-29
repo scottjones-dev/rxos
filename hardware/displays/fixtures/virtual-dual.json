@@ -1,0 +1,30 @@
+[
+  {
+    "index": 0,
+    "connector": "DP-1",
+    "identifier": "virtual-driver",
+    "edidId": "virtual-edid-driver",
+    "width": 2560,
+    "height": 720,
+    "refreshHz": 60,
+    "densityPpi": 170,
+    "physicalWidthMm": 600,
+    "physicalHeightMm": 170,
+    "x": 0,
+    "y": 0
+  },
+  {
+    "index": 1,
+    "connector": "HDMI-A-1",
+    "identifier": "virtual-cabin",
+    "edidId": "virtual-edid-cabin",
+    "width": 1920,
+    "height": 1080,
+    "refreshHz": 60,
+    "densityPpi": 160,
+    "physicalWidthMm": 345,
+    "physicalHeightMm": 194,
+    "x": 2560,
+    "y": 0
+  }
+]

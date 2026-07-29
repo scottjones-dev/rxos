@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QElapsedTimer>
+#include <QHash>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QString>
 #include <QVector>
 #include <algorithm>
@@ -20,6 +23,8 @@ public:
         }
         const qint64 intervalUs = timer_.nsecsElapsed() / 1'000;
         timer_.restart();
+        if (intervalUs > 16'700 && !currentEvent_.isEmpty())
+            ++correlatedLongFrames_[currentEvent_];
         if (intervalsUs_.size() < MaximumIntervals) {
             intervalsUs_.append(intervalUs);
         } else {
@@ -30,6 +35,8 @@ public:
     }
 
     [[nodiscard]] quint64 frameCount() const { return frameCount_; }
+
+    void markEvent(const QString &event) { currentEvent_ = event.left(80); }
 
     [[nodiscard]] QString summary(const QString &component) const
     {
@@ -49,7 +56,7 @@ public:
         const double maximumMs =
             sorted.isEmpty() ? 0.0 : static_cast<double>(sorted.constLast()) / 1'000.0;
         return QStringLiteral(
-                   R"({"component":"%1","event":"frame_timing_summary","frames":%2,"retainedIntervals":%3,"overwrittenIntervals":%4,"medianMs":%5,"p95Ms":%6,"p99Ms":%7,"maximumMs":%8,"over16_7Ms":%9,"over33_3Ms":%10,"over50Ms":%11,"over100Ms":%12})")
+                   R"({"component":"%1","event":"frame_timing_summary","frames":%2,"retainedIntervals":%3,"overwrittenIntervals":%4,"medianMs":%5,"p95Ms":%6,"p99Ms":%7,"maximumMs":%8,"over16_7Ms":%9,"over33_3Ms":%10,"over50Ms":%11,"over100Ms":%12,"correlatedLongFrames":%13})")
             .arg(component)
             .arg(frameCount_)
             .arg(sorted.size())
@@ -61,7 +68,8 @@ public:
             .arg(thresholdCount(16'700))
             .arg(thresholdCount(33'300))
             .arg(thresholdCount(50'000))
-            .arg(thresholdCount(100'000));
+            .arg(thresholdCount(100'000))
+            .arg(correlationJson());
     }
 
 private:
@@ -70,4 +78,15 @@ private:
     qsizetype writeIndex_ = 0;
     quint64 frameCount_ = 0;
     quint64 overwrittenIntervals_ = 0;
+    QString currentEvent_ = QStringLiteral("startup");
+    QHash<QString, quint64> correlatedLongFrames_;
+
+    [[nodiscard]] QString correlationJson() const
+    {
+        QJsonObject result;
+        for (auto iterator = correlatedLongFrames_.cbegin();
+             iterator != correlatedLongFrames_.cend(); ++iterator)
+            result.insert(iterator.key(), static_cast<qint64>(iterator.value()));
+        return QString::fromUtf8(QJsonDocument(result).toJson(QJsonDocument::Compact));
+    }
 };

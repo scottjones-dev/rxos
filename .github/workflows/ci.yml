@@ -86,6 +86,28 @@ jobs:
         run: pnpm --filter @rxos/vehicle-simulator... build
       - name: Build milestone 1.3 validation tooling
         run: pnpm --filter @rxos/validation-tools... build
+      - name: Validate milestone 1.5 prototype software
+        run: |
+          node apps/validation-tools/dist/src/display-detection.js \
+            --inventory hardware/displays/fixtures/virtual-dual.json \
+            --output build/prototype-display-detection.json
+          node apps/validation-tools/dist/src/prototype-launcher.js \
+            --inventory hardware/displays/fixtures/virtual-dual.json \
+            --validate-only --output build/prototype-validation
+          node apps/validation-tools/dist/src/prototype-simulate.js rotary \
+            build/prototype-rotary.json
+          node apps/validation-tools/dist/src/prototype-simulate.js power \
+            build/prototype-power.json
+          node apps/validation-tools/dist/src/prototype-simulate.js boot \
+            build/prototype-boot.json
+          node apps/validation-tools/dist/src/prototype-review.js \
+            --kind occlusion \
+            --input hardware/displays/fixtures/driver-occlusion-synthetic.json \
+            --output build/prototype-review
+          node apps/validation-tools/dist/src/prototype-review.js \
+            --kind touch \
+            --input hardware/displays/fixtures/cabin-touch-synthetic.json \
+            --output build/prototype-review
       - run: pnpm localisation:validate
       - run: pnpm qt:test
       - run: pnpm visual:verify
@@ -109,6 +131,13 @@ jobs:
           pnpm performance:native:compare build/performance/chart-stress.json
       - name: Create native performance summary
         run: pnpm performance:native:artifact build/performance/native-concurrent-short.json build/performance/native-concurrent-short.md
+      - name: Create redacted prototype diagnostics
+        run: |
+          node apps/validation-tools/dist/src/prototype-diagnostics.js \
+            --display-report build/prototype-display-detection.json \
+            --assignment build/prototype-validation/assignment.json \
+            --performance build/performance/native-concurrent-short.json \
+            --output build/prototype-diagnostics
       - name: Upload visual and performance review evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -121,3 +150,10 @@ jobs:
             build/visual/diff
             build/visual/gallery
             build/performance
+            build/prototype-display-detection.json
+            build/prototype-validation
+            build/prototype-rotary.json
+            build/prototype-power.json
+            build/prototype-boot.json
+            build/prototype-review
+            build/prototype-diagnostics

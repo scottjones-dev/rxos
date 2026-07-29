@@ -3,3 +3,5 @@ export const rxosConfig = {
   telemetryHz: 10,
   staleAfterMs: 1_500,
 } as const;
+
+export * from "./prototype.js";

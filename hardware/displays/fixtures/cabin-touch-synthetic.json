@@ -1,0 +1,25 @@
+{
+  "targets": [
+    {
+      "id": "home",
+      "bounds": { "x": 0, "y": 0, "width": 72, "height": 72 },
+      "adjacentTargetIds": ["navigation"]
+    },
+    {
+      "id": "navigation",
+      "bounds": { "x": 72, "y": 0, "width": 72, "height": 72 },
+      "adjacentTargetIds": ["home"]
+    }
+  ],
+  "observations": [
+    {
+      "targetId": "home",
+      "x": 36,
+      "y": 36,
+      "durationMs": 120,
+      "activatedTargetId": "home"
+    }
+  ],
+  "source": "synthetic-ci-fixture",
+  "containsBiometricData": false
+}

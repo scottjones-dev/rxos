@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "name": "prototype-dual-display",
+  "mode": "fullscreen",
+  "allowDevelopmentFallback": false,
+  "roles": {
+    "driver": {
+      "identifier": "configure-driver-display"
+    },
+    "cabin": {
+      "identifier": "configure-cabin-display"
+    }
+  },
+  "displays": {
+    "driver": {
+      "widthPx": 2560,
+      "heightPx": 720,
+      "physicalWidthMm": null,
+      "physicalHeightMm": null,
+      "densityPpi": 170,
+      "safeAreaMm": { "top": 0, "right": 0, "bottom": 0, "left": 0 },
+      "bezelMm": { "top": 0, "right": 0, "bottom": 0, "left": 0 }
+    },
+    "cabin": {
+      "widthPx": 1920,
+      "heightPx": 1080,
+      "physicalWidthMm": null,
+      "physicalHeightMm": null,
+      "densityPpi": 170,
+      "safeAreaMm": { "top": 0, "right": 0, "bottom": 0, "left": 0 },
+      "bezelMm": { "top": 0, "right": 0, "bottom": 0, "left": 0 }
+    }
+  }
+}

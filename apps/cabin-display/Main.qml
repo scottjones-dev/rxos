@@ -8,6 +8,13 @@ ApplicationWindow {
 
     DisplayProfiles { id: profile; profile: "cabin" }
     DisplaySettings { id: settings }
+    BrightnessModel {
+        id: brightness
+        manualLevel: Number(profile.option("--cabin-brightness") || 0.8)
+        ambientLevel: Number(profile.option("--ambient-level") || 1)
+        automatic: profile.hasFlag("--automatic-theme")
+        onThemeNameChanged: settings.themeSelection = themeName
+    }
     RxStrings { id: strings; localeName: profile.option("--locale") || "en-GB" }
     PresentationFormatter {
         id: formatter
@@ -61,9 +68,45 @@ ApplicationWindow {
 
     width: profile.width
     height: profile.height
-    visible: true
+    visible: !profile.nativePlacement
     color: theme.background
     title: "RXOS Cabin Display"
+    PhysicalReviewOverlay {
+        anchors.fill: parent
+        reviewEnabled: profile.physicalReview
+        safeInset: Number(profile.option("--review-safe-inset") || profile.safeMargin)
+        physicalWidthMm: Number(profile.option("--physical-width-mm") || 0)
+        physicalHeightMm: Number(profile.option("--physical-height-mm") || 0)
+        showTouchReach: true
+    }
+    Rectangle {
+        anchors.fill: parent
+        z: 9000
+        visible: profile.brightnessSimulation
+        enabled: false
+        color: "#000000"
+        opacity: (1 - brightness.effectiveLevel) * 0.75
+    }
+    RotaryController {
+        id: rotary
+        focusCount: window.applications.length
+        onActivated: index => window.navigate(index)
+        onBackRequested: window.goBack()
+        onHomeRequested: window.goHome()
+    }
+    Shortcut { sequence: "Right"; onActivated: rotary.dispatch("clockwise", "cabin") }
+    Shortcut { sequence: "Left"; onActivated: rotary.dispatch("anticlockwise", "cabin") }
+    Shortcut { sequence: "Return"; onActivated: rotary.dispatch("press", "cabin") }
+    Shortcut {
+        sequence: "Ctrl+]"
+        onActivated: brightness.manualLevel = Math.min(1,
+            brightness.manualLevel + 0.05)
+    }
+    Shortcut {
+        sequence: "Ctrl+["
+        onActivated: brightness.manualLevel = Math.max(0,
+            brightness.manualLevel - 0.05)
+    }
     LayoutMirroring.enabled: strings.rightToLeft
     LayoutMirroring.childrenInherit: true
     readonly property bool reliabilityComplete: telemetry.reliabilityComplete
@@ -85,6 +128,8 @@ ApplicationWindow {
         + (diagnosticsLoader.item ? 1 : 0)
         + (settingsLoader.item ? 1 : 0)
     readonly property int hiddenWorkCount: Math.max(0, loadedPageCount - 1)
+    property int profileEventSequence: 0
+    property string profileEventName: "qml-ready"
     readonly property string requestedScenario: profile.option("--visual-scenario") || ""
     readonly property string requestedProfileScenario: profile.option("--profile-scenario") || "home"
     readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
@@ -118,7 +163,28 @@ ApplicationWindow {
     }
 
     function navigate(index) {
+        markProfileEvent("page-transition")
         navigation.navigate(index)
+    }
+
+    function markProfileEvent(name) {
+        profileEventName = name
+        profileEventSequence += 1
+    }
+
+    Connections {
+        target: rpmHistory
+        function onPublishedCountChanged() {
+            window.markProfileEvent("chart-refresh")
+        }
+    }
+    Connections {
+        target: settings
+        function onThemeSelectionChanged() { window.markProfileEvent("theme-change") }
+    }
+    Connections {
+        target: warningModel
+        function onActiveWarningsChanged() { window.markProfileEvent("warning-overlay") }
     }
 
     function goHome() {
@@ -130,6 +196,7 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
+        brightness.updateAmbient(brightness.ambientLevel)
         if (requestedProfileScenario === "performance")
             navigate(4)
         else

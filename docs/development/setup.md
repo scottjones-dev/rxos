@@ -197,6 +197,57 @@ The scheduled/manual `Extended native performance` GitHub workflow supplies
 `QT_QPA_PLATFORM=xcb xvfb-run ...` and must not be compared with offscreen
 reports.
 
+## Temporary dual-display prototype
+
+Build the release displays, then edit a copy of
+`hardware/displays/profiles/prototype-dual-display.json` with the connector or
+EDID-derived identifiers and measured panel dimensions. The placeholder
+profile intentionally fails instead of placing a display arbitrarily.
+
+```bash
+pnpm qt:configure:release
+pnpm qt:build:release
+pnpm prototype:display:detect
+pnpm prototype:display:validate
+pnpm prototype:dev
+pnpm prototype:fullscreen
+pnpm prototype:review
+```
+
+The driver cursor is hidden; the cabin cursor remains available for development
+and touchscreen diagnostics. Use `--windowed` only for development. On Linux,
+record `XDG_SESSION_TYPE`, compositor, GPU, graphics driver, both connectors,
+resolution, refresh, scaling, and physical dimensions. Wayland is preferred
+for representative work, X11 is supported, and Xvfb/offscreen are virtual CI
+environments rather than GPU qualification.
+
+Automatic display discovery is Linux-only. Windows can validate profiles with
+the committed virtual inventory, but representative placement must run on
+Linux:
+
+```powershell
+pnpm prototype:display:validate
+pnpm prototype:verify:software
+```
+
+Generate review evidence and an allow-listed diagnostic bundle with:
+
+```bash
+pnpm prototype:rotary
+pnpm prototype:power
+pnpm prototype:boot
+pnpm prototype:review:occlusion
+pnpm prototype:review:touch
+pnpm prototype:performance
+pnpm prototype:diagnostics
+pnpm prototype:verify:hardware
+```
+
+The hardware command is a bounded representative session, not automotive
+certification. Complete the checklists in `docs/review`; software results do
+not close physical visibility, touch, daylight, night, mounting, or power
+reviews.
+
 Baseline generation is an intentional review action: inspect the generated
 gallery before committing changed images. Native tools honour
 `RXOS_DRIVER_EXECUTABLE` and `RXOS_CABIN_EXECUTABLE` when a generator places

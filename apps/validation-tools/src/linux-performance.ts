@@ -2,7 +2,7 @@ import { execFileSync, spawn } from "node:child_process";
 import type { ChildProcess } from "node:child_process";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
-import { arch, cpus, platform, release } from "node:os";
+import { arch, cpus, platform, release, totalmem } from "node:os";
 import { resolve } from "node:path";
 import { qtEnvironment, terminate } from "./process.js";
 
@@ -41,6 +41,20 @@ interface Options {
   readonly rates: readonly number[];
   readonly scenario: string;
   readonly buildType: "Debug" | "Release";
+}
+
+function optionalCommand(
+  command: string,
+  arguments_: readonly string[],
+): string | null {
+  try {
+    return execFileSync(command, arguments_, {
+      encoding: "utf8",
+      timeout: 5_000,
+    }).trim();
+  } catch {
+    return null;
+  }
 }
 
 function valueAfter(
@@ -429,9 +443,26 @@ await writeFile(
         release: release(),
         architecture: arch(),
         logicalCpuCount: cpus().length,
+        cpuModel: cpus()[0]?.model ?? "unknown",
+        totalMemoryBytes: totalmem(),
         buildType: options.buildType,
         qtPlatform: qtEnvironment.QT_QPA_PLATFORM,
         renderingBackend: qtEnvironment.QSG_RHI_BACKEND,
+        displayServer:
+          process.env.XDG_SESSION_TYPE ??
+          (process.env.WAYLAND_DISPLAY
+            ? "wayland"
+            : process.env.DISPLAY
+              ? "x11"
+              : "unknown"),
+        qtVersion: optionalCommand("qmake", ["-query", "QT_VERSION"]),
+        gpuPciInventory: optionalCommand("lspci", []),
+        graphicsApi: optionalCommand("glxinfo", ["-B"]),
+        gpuUtilisation: optionalCommand("nvidia-smi", [
+          "--query-gpu=utilization.gpu,memory.used,memory.total,driver_version",
+          "--format=csv,noheader,nounits",
+        ]),
+        powerMode: optionalCommand("powerprofilesctl", ["get"]),
         screenProfiles: {
           driver: "2560x720",
           cabin: "1920x1080",
@@ -466,6 +497,7 @@ await writeFile(
           process.platform === "linux"
             ? "attempted: null means procfs fd access unavailable"
             : "unsupported: Linux procfs required",
+        gpu: "best effort: inventory/API plus NVIDIA metrics when available; null is explicitly unsupported",
       },
       options,
       runs,

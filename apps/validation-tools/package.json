@@ -11,6 +11,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@rxos/config": "workspace:*",
     "@rxos/telemetry-fixtures": "workspace:*",
     "pixelmatch": "^7.1.0",
     "pngjs": "^7.0.0",

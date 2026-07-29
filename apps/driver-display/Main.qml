@@ -8,6 +8,13 @@ ApplicationWindow {
 
     DisplayProfiles { id: profile; profile: "driver" }
     DisplaySettings { id: settings }
+    BrightnessModel {
+        id: brightness
+        manualLevel: Number(profile.option("--driver-brightness") || 0.8)
+        ambientLevel: Number(profile.option("--ambient-level") || 1)
+        automatic: profile.hasFlag("--automatic-theme")
+        onThemeNameChanged: settings.themeSelection = themeName
+    }
     RxStrings { id: strings; localeName: profile.option("--locale") || "en-GB" }
     PresentationFormatter {
         id: formatter
@@ -41,9 +48,27 @@ ApplicationWindow {
 
     width: profile.width
     height: profile.height
-    visible: true
+    visible: !profile.nativePlacement
     color: theme.background
     title: "RXOS Driver Display"
+    PhysicalReviewOverlay {
+        anchors.fill: parent
+        reviewEnabled: profile.physicalReview
+        safeInset: Number(profile.option("--review-safe-inset") || profile.safeMargin)
+        physicalWidthMm: Number(profile.option("--physical-width-mm") || 0)
+        physicalHeightMm: Number(profile.option("--physical-height-mm") || 0)
+        wheelDiameter: Number(profile.option("--wheel-diameter-px") || 0)
+        wheelCentreX: Number(profile.option("--wheel-centre-x-px") || window.width / 2)
+        wheelCentreY: Number(profile.option("--wheel-centre-y-px") || window.height)
+    }
+    Rectangle {
+        anchors.fill: parent
+        z: 9000
+        visible: profile.brightnessSimulation
+        enabled: false
+        color: "#000000"
+        opacity: (1 - brightness.effectiveLevel) * 0.75
+    }
     LayoutMirroring.enabled: strings.rightToLeft
     LayoutMirroring.childrenInherit: true
     readonly property bool reliabilityComplete: telemetry.reliabilityComplete
@@ -61,6 +86,8 @@ ApplicationWindow {
     readonly property string requestedProfileScenario: profile.option("--profile-scenario") || "daily"
     readonly property bool visualReady: requestedScenario.length === 0 || visualScenario.ready
     readonly property bool live: telemetry.status === "LIVE"
+    property int profileEventSequence: 0
+    property string profileEventName: "qml-ready"
     readonly property string currentMode: settings.driverMode
     VisualScenario {
         id: visualScenario
@@ -79,11 +106,28 @@ ApplicationWindow {
     }
 
     function setMode(mode) {
-        if (modeState.select(mode))
+        if (modeState.select(mode)) {
             settings.driverMode = mode
+            markProfileEvent("driver-mode-" + mode.toLowerCase())
+        }
+    }
+
+    function markProfileEvent(name) {
+        profileEventName = name
+        profileEventSequence += 1
+    }
+
+    Connections {
+        target: settings
+        function onThemeSelectionChanged() { window.markProfileEvent("theme-change") }
+    }
+    Connections {
+        target: warningModel
+        function onActiveWarningsChanged() { window.markProfileEvent("warning-overlay") }
     }
 
     Component.onCompleted: {
+        brightness.updateAmbient(brightness.ambientLevel)
         if (requestedProfileScenario === "performance")
             setMode("Performance")
         else if (requestedProfileScenario === "track")

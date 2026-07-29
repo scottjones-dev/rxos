@@ -14,12 +14,19 @@ QtObject {
     readonly property real scale: realOption("--scale", 1.0, 0.75, 2.0)
     readonly property bool touchEnabled: profile === "cabin"
     readonly property int safeMargin: Math.round(48 * scale)
+    readonly property bool nativePlacement: hasFlag("--native-placement")
+    readonly property bool physicalReview: hasFlag("--physical-review")
+    readonly property bool brightnessSimulation: hasFlag("--brightness-simulation")
 
     function option(name) {
         const index = profiles.arguments.indexOf(name)
         return index >= 0 && index + 1 < profiles.arguments.length
             ? profiles.arguments[index + 1]
             : undefined
+    }
+
+    function hasFlag(name) {
+        return profiles.arguments.includes(name)
     }
 
     function integerOption(name, fallback, minimum, maximum) {

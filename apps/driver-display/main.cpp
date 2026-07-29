@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QTranslator>
 #include <csignal>
+#include "display-placement.h"
 #include "native-performance.h"
 
 namespace {
@@ -53,17 +54,72 @@ int main(int argc, char *argv[])
         return -1;
     QObject *rootObject = engine.rootObjects().constFirst();
     auto *rootWindow = qobject_cast<QQuickWindow *>(rootObject);
+    rxosLogScreens(QStringLiteral("driver-display"));
+    if (!rxosPlaceWindow(rootWindow, arguments, QStringLiteral("driver-display"), true))
+        return 4;
+    const QString assignedScreenName = rootWindow && rootWindow->screen()
+                                           ? rootWindow->screen()->name()
+                                           : QString();
+    if (rootWindow) {
+        QObject::connect(rootWindow, &QWindow::screenChanged, &application,
+                         [rootWindow, assignedScreenName](QScreen *screen) {
+            if (screen && screen->name() != assignedScreenName) {
+                rootWindow->hide();
+                qCritical().noquote()
+                    << R"({"component":"driver-display","event":"assigned_display_migrated","action":"hidden"})";
+            }
+        });
+    }
+    QObject::connect(&application, &QGuiApplication::screenRemoved, &application,
+                     [rootWindow](QScreen *screen) {
+        if (rootWindow && rootWindow->screen() == screen) {
+            rootWindow->hide();
+            qCritical().noquote()
+                << R"({"component":"driver-display","event":"assigned_display_disconnected"})";
+        }
+    });
+    QObject::connect(&application, &QGuiApplication::screenAdded, &application,
+                     [rootWindow, arguments](QScreen *) {
+        rxosLogScreens(QStringLiteral("driver-display"));
+        if (rootWindow && !rootWindow->isVisible())
+            rxosPlaceWindow(rootWindow, arguments, QStringLiteral("driver-display"), true);
+    });
     FrameTimingProbe frameTiming;
+    bool firstFrame = true;
     if (rootWindow) {
         QObject::connect(rootWindow, &QQuickWindow::frameSwapped, &application,
-                         [&frameTiming]() { frameTiming.recordFrame(); });
+                         [&frameTiming, &firstFrame, &startupTimer]() {
+            frameTiming.recordFrame();
+            if (firstFrame) {
+                firstFrame = false;
+                qInfo().noquote()
+                    << QStringLiteral(R"({"component":"driver-display","event":"window_visible","startupMs":%1})")
+                           .arg(startupTimer.elapsed());
+            }
+        });
     }
     qInfo().noquote() << QStringLiteral(
         R"({"component":"driver-display","event":"ui_ready","startupMs":%1})")
                              .arg(startupTimer.elapsed());
+    qInfo().noquote()
+        << QStringLiteral(R"({"component":"driver-display","event":"essential_ui_ready","startupMs":%1})")
+               .arg(startupTimer.elapsed());
+    int lastProfileEventSequence = -1;
+    QTimer profileInstrumentation;
+    profileInstrumentation.setInterval(10);
+    QObject::connect(&profileInstrumentation, &QTimer::timeout, &application,
+                     [rootObject, &frameTiming, &lastProfileEventSequence]() {
+        const int sequence = rootObject->property("profileEventSequence").toInt();
+        if (sequence == lastProfileEventSequence)
+            return;
+        lastProfileEventSequence = sequence;
+        frameTiming.markEvent(rootObject->property("profileEventName").toString());
+    });
+    profileInstrumentation.start();
 
     const bool reliabilityTest = arguments.contains(QStringLiteral("--reliability-test"));
     const bool smokeTest = arguments.contains(QStringLiteral("--smoke-test"));
+    const bool captureContinue = arguments.contains(QStringLiteral("--capture-continue"));
     const QString capturePath = optionValue(arguments, QStringLiteral("--capture"));
     const int exitAfter = optionValue(arguments, QStringLiteral("--exit-after")).toInt();
     if (smokeTest)
@@ -93,7 +149,7 @@ int main(int argc, char *argv[])
     if (reliabilityTest || !capturePath.isEmpty() || exitAfter > 0) {
         poll.setInterval(50);
         QObject::connect(&poll, &QTimer::timeout, &application,
-                         [&application, &engine, reliabilityTest, capturePath, exitAfter, &poll]() {
+                         [&application, &engine, reliabilityTest, capturePath, captureContinue, exitAfter, &poll]() {
             QObject *root = engine.rootObjects().constFirst();
             if (reliabilityTest && root->property("reliabilityComplete").toBool()) {
                 application.exit(0);
@@ -120,7 +176,8 @@ int main(int argc, char *argv[])
                     << QStringLiteral(R"({"component":"driver-display","event":"visual_capture","saved":%1,"path":"%2"})")
                            .arg(saved ? QStringLiteral("true") : QStringLiteral("false"),
                                 capturePath);
-                application.exit(saved ? 0 : 3);
+                if (!captureContinue || !saved)
+                    application.exit(saved ? 0 : 3);
             }
         });
         timeout.setSingleShot(true);

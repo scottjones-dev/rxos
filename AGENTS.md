@@ -114,6 +114,19 @@ pnpm qt:test
 pnpm verify
 pnpm verify:milestone-1.3
 pnpm verify:milestone-1.4
+pnpm prototype:dev
+pnpm prototype:fullscreen
+pnpm prototype:review
+pnpm prototype:display:detect
+pnpm prototype:display:validate
+pnpm prototype:rotary
+pnpm prototype:power
+pnpm prototype:boot
+pnpm prototype:performance
+pnpm prototype:diagnostics
+pnpm prototype:verify:software
+pnpm prototype:verify:hardware
+pnpm verify:milestone-1.5
 ```
 
 Run the TypeScript simulator with
@@ -168,3 +181,13 @@ rxos-vehicle-gateway`, with the same playback flag.
     requires a genuinely completed run of at least ten minutes.
 24. Preserve the 600-sample chart retention cap, 240-point render cap and
     inactive-page work tests unless an evidence-backed ADR changes them.
+25. Display assignment must fail closed. Never silently swap driver and cabin
+    roles; permit development fallback only through explicit configuration.
+26. Keep physical-review overlays development-only and label synthetic geometry
+    as unverified. Millimetre inputs require recorded physical measurements.
+27. Keep prototype brightness, rotary, ignition and power inputs simulated or
+    behind an explicit prototype adapter. Do not connect vehicle wiring.
+28. Keep diagnostic bundles allow-listed and redact secret-shaped values. Never
+    collect personal files, tokens, unrelated logs or biometric touch data.
+29. Separate offscreen, Xvfb, X11 and Wayland/GPU evidence. Milestone 1.5 cannot
+    be declared complete until representative physical reviews are recorded.

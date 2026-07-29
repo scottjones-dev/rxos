@@ -1,0 +1,16 @@
+[
+  {
+    "index": 0,
+    "connector": "DP-1",
+    "identifier": "virtual-driver",
+    "edidId": "virtual-edid-driver",
+    "width": 2560,
+    "height": 720,
+    "refreshHz": 60,
+    "densityPpi": 170,
+    "physicalWidthMm": 600,
+    "physicalHeightMm": 170,
+    "x": 0,
+    "y": 0
+  }
+]

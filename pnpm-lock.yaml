@@ -45,6 +45,9 @@ importers:
 
   apps/validation-tools:
     dependencies:
+      '@rxos/config':
+        specifier: workspace:*
+        version: link:../../packages/config
       '@rxos/telemetry-fixtures':
         specifier: workspace:*
         version: link:../../packages/telemetry-fixtures

@@ -7,6 +7,8 @@ buffer. Shutdown logs contain:
 - total frames and retained/overwritten intervals;
 - median, p95, p99 and maximum interval in milliseconds;
 - interval counts above 16.7, 33.3, 50 and 100 milliseconds.
+- bounded counts of long frames correlated with the latest UI event marker,
+  including page transitions, chart refresh, mode/theme changes and warnings.
 
 This instrumentation is intentionally low cost: one monotonic timer read and
 one bounded vector write per swap. Sorting occurs only during shutdown.
@@ -33,3 +35,9 @@ latest 36,000 intervals and reported:
 The mixture of short and long intervals is consistent with bursty offscreen
 swap signalling, so these values establish instrumentation and a host baseline,
 not smoothness on a physical display.
+
+Milestone 1.5 adds correlation markers to investigate the milestone 1.4
+distribution. They show temporal association, not causation. Shader compilation,
+scene-graph synchronisation, compositor scheduling, VSync, screenshot hooks and
+GPU behaviour still require external GPU/compositor evidence. Do not optimise
+from CI offscreen measurements alone.
