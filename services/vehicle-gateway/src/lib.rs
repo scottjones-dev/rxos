@@ -91,13 +91,13 @@ pub struct TelemetryEnvelope {
 impl TelemetryEnvelope {
     #[must_use]
     pub fn is_valid(&self) -> bool {
-        let canonical_timestamp = self
-            .captured_at
-            .parse::<chrono::DateTime<Utc>>()
-            .is_ok_and(|timestamp| {
-                timestamp.to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
-                    == self.captured_at
-            });
+        let canonical_timestamp =
+            self.captured_at
+                .parse::<chrono::DateTime<Utc>>()
+                .is_ok_and(|timestamp| {
+                    timestamp.to_rfc3339_opts(chrono::SecondsFormat::Millis, true)
+                        == self.captured_at
+                });
         self.schema_version == SCHEMA_VERSION
             && canonical_timestamp
             && (0.0..=12_000.0).contains(&self.telemetry.rpm)
@@ -280,10 +280,7 @@ impl TelemetryProvider for PlaybackProvider {
 
 impl Drop for PlaybackProvider {
     fn drop(&mut self) {
-        structured_log(
-            "playback_finish",
-            json!({ "samplesPlayed": self.sequence }),
-        );
+        structured_log("playback_finish", json!({ "samplesPlayed": self.sequence }));
     }
 }
 
@@ -299,9 +296,7 @@ async fn telemetry_upgrade(
 ) -> Response {
     let client_id = state.next_client_id.fetch_add(1, Ordering::Relaxed);
     structured_log("client_connection", json!({ "clientId": client_id }));
-    upgrade.on_upgrade(move |socket| {
-        stream_to_client(socket, state.sender.subscribe(), client_id)
-    })
+    upgrade.on_upgrade(move |socket| stream_to_client(socket, state.sender.subscribe(), client_id))
 }
 
 async fn stream_to_client(

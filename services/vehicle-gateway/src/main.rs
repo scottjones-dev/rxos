@@ -7,7 +7,10 @@ use rxos_vehicle_gateway::{
 fn provider_from_args(
     arguments: &[String],
 ) -> Result<Box<dyn TelemetryProvider>, Box<dyn std::error::Error>> {
-    if let Some(index) = arguments.iter().position(|argument| argument == "--playback") {
+    if let Some(index) = arguments
+        .iter()
+        .position(|argument| argument == "--playback")
+    {
         let path = arguments
             .get(index + 1)
             .ok_or("--playback requires a recording path")?;
