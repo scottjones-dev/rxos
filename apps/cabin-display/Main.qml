@@ -30,13 +30,14 @@ ApplicationWindow {
                 Repeater {
                     model: window.pages
                     delegate: Button {
+                        id: pageButton
                         required property string modelData
                         required property int index
                         Layout.fillWidth: true
                         Layout.preferredHeight: 70
-                        text: modelData
-                        highlighted: window.currentPage === index
-                        onClicked: window.currentPage = index
+                        text: pageButton.modelData
+                        highlighted: window.currentPage === pageButton.index
+                        onClicked: window.currentPage = pageButton.index
                     }
                 }
                 Item { Layout.fillHeight: true }
@@ -68,9 +69,42 @@ ApplicationWindow {
                 heading: "Media"
                 subtitle: "Local media session placeholder"
                 Row {
-                    anchors.centerIn: parent; spacing: 50
-                    Rectangle { width: 330; height: 330; radius: 24; color: "#202B3D"; Text { anchors.centerIn: parent; text: "ALBUM\nART"; color: "#8C9AAF"; font.pixelSize: 40; horizontalAlignment: Text.AlignHCenter } }
-                    Column { anchors.verticalCenter: parent.verticalCenter; spacing: 24; Text { text: "No media playing"; color: "#F4F7FB"; font.pixelSize: 46; font.bold: true }; Text { text: "Bluetooth and audio integration arrive in a later phase"; color: "#8C9AAF"; font.pixelSize: 24 }; Row { spacing: 20; Button { text: "◀" }; Button { text: "▶" }; Button { text: "▶▶" } } }
+                    anchors.centerIn: parent
+                    spacing: 50
+                    Rectangle {
+                        width: 330
+                        height: 330
+                        radius: 24
+                        color: "#202B3D"
+                        Text {
+                            anchors.centerIn: parent
+                            text: "ALBUM\nART"
+                            color: "#8C9AAF"
+                            font.pixelSize: 40
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                    }
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 24
+                        Text {
+                            text: "No media playing"
+                            color: "#F4F7FB"
+                            font.pixelSize: 46
+                            font.bold: true
+                        }
+                        Text {
+                            text: "Bluetooth and audio integration arrive in a later phase"
+                            color: "#8C9AAF"
+                            font.pixelSize: 24
+                        }
+                        Row {
+                            spacing: 20
+                            Button { text: "◀" }
+                            Button { text: "▶" }
+                            Button { text: "▶▶" }
+                        }
+                    }
                 }
             }
             PagePanel {
@@ -80,7 +114,12 @@ ApplicationWindow {
                     anchors.centerIn: parent; columns: 3; spacing: 22
                     Repeater {
                         model: [["SPEED", Math.round(telemetry.data.speedKph) + " km/h"], ["ENGINE", Math.round(telemetry.data.rpm) + " rpm"], ["GEAR", telemetry.data.gear], ["FUEL", Math.round(telemetry.data.fuelPercent) + "%"], ["COOLANT", Math.round(telemetry.data.coolantTempC) + "°C"], ["BATTERY", telemetry.data.batteryVoltage.toFixed(1) + " V"]]
-                        delegate: MetricCard { required property var modelData; label: modelData[0]; value: modelData[1] }
+                        delegate: MetricCard {
+                            id: overviewMetric
+                            required property var modelData
+                            label: overviewMetric.modelData[0]
+                            value: overviewMetric.modelData[1]
+                        }
                     }
                 }
             }
@@ -91,7 +130,12 @@ ApplicationWindow {
                     anchors.centerIn: parent; columns: 3; spacing: 22
                     Repeater {
                         model: [["RPM", Math.round(telemetry.data.rpm)], ["SPEED", telemetry.data.speedKph.toFixed(1) + " km/h"], ["THROTTLE", telemetry.data.throttlePercent.toFixed(1) + "%"], ["COOLANT", telemetry.data.coolantTempC.toFixed(1) + "°C"], ["OIL TEMP", telemetry.data.oilTempC.toFixed(1) + "°C"], ["OIL PRESS", Math.round(telemetry.data.oilPressureKpa) + " kPa"], ["FUEL", telemetry.data.fuelPercent.toFixed(1) + "%"], ["BATTERY", telemetry.data.batteryVoltage.toFixed(2) + " V"], ["GEAR", telemetry.data.gear]]
-                        delegate: MetricCard { required property var modelData; label: modelData[0]; value: modelData[1] }
+                        delegate: MetricCard {
+                            id: telemetryMetric
+                            required property var modelData
+                            label: telemetryMetric.modelData[0]
+                            value: telemetryMetric.modelData[1]
+                        }
                     }
                 }
             }
@@ -103,9 +147,31 @@ ApplicationWindow {
                     Repeater {
                         model: [["Check engine", telemetry.data.warnings.checkEngine], ["Coolant temperature", telemetry.data.warnings.coolantTemperature], ["Low fuel", telemetry.data.warnings.lowFuel], ["Low oil pressure", telemetry.data.warnings.lowOilPressure]]
                         delegate: Rectangle {
+                            id: diagnosticDelegate
                             required property var modelData
-                            width: 900; height: 90; radius: 16; color: "#111722"; border.color: modelData[1] ? "#FF4057" : "#202B3D"
-                            RowLayout { anchors { fill: parent; margins: 24 }; Text { text: modelData[0]; color: "#F4F7FB"; font.pixelSize: 28; Layout.fillWidth: true }; Text { text: modelData[1] ? "SIMULATED WARNING" : "OK"; color: modelData[1] ? "#FF4057" : "#43E09D"; font.bold: true; font.pixelSize: 22 } }
+                            width: 900
+                            height: 90
+                            radius: 16
+                            color: "#111722"
+                            border.color: diagnosticDelegate.modelData[1] ? "#FF4057" : "#202B3D"
+                            RowLayout {
+                                anchors {
+                                    fill: parent
+                                    margins: 24
+                                }
+                                Text {
+                                    text: diagnosticDelegate.modelData[0]
+                                    color: "#F4F7FB"
+                                    font.pixelSize: 28
+                                    Layout.fillWidth: true
+                                }
+                                Text {
+                                    text: diagnosticDelegate.modelData[1] ? "SIMULATED WARNING" : "OK"
+                                    color: diagnosticDelegate.modelData[1] ? "#FF4057" : "#43E09D"
+                                    font.bold: true
+                                    font.pixelSize: 22
+                                }
+                            }
                         }
                     }
                 }

@@ -36,7 +36,7 @@ pub const SCHEMA_VERSION: u8 = 1;
 pub const UPDATE_INTERVAL: Duration = Duration::from_millis(100);
 pub const BROADCAST_CAPACITY: usize = 32;
 
-fn structured_log(event: &str, context: serde_json::Value) {
+fn structured_log(event: &str, context: &serde_json::Value) {
     println!(
         "{}",
         json!({
@@ -49,6 +49,7 @@ fn structured_log(event: &str, context: serde_json::Value) {
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
+#[allow(clippy::struct_excessive_bools)]
 pub struct WarningIndicators {
     pub check_engine: bool,
     pub coolant_temperature: bool,
@@ -256,7 +257,7 @@ impl PlaybackProvider {
         }
         structured_log(
             "playback_start",
-            json!({ "path": path, "samples": samples.len() }),
+            &json!({ "path": path, "samples": samples.len() }),
         );
         Ok(Self {
             samples,
@@ -280,7 +281,7 @@ impl TelemetryProvider for PlaybackProvider {
 
 impl Drop for PlaybackProvider {
     fn drop(&mut self) {
-        structured_log("playback_finish", json!({ "samplesPlayed": self.sequence }));
+        structured_log("playback_finish", &json!({ "samplesPlayed": self.sequence }));
     }
 }
 
@@ -295,7 +296,7 @@ async fn telemetry_upgrade(
     State(state): State<Arc<GatewayState>>,
 ) -> Response {
     let client_id = state.next_client_id.fetch_add(1, Ordering::Relaxed);
-    structured_log("client_connection", json!({ "clientId": client_id }));
+    structured_log("client_connection", &json!({ "clientId": client_id }));
     upgrade.on_upgrade(move |socket| stream_to_client(socket, state.sender.subscribe(), client_id))
 }
 
@@ -307,8 +308,8 @@ async fn stream_to_client(
     let (mut socket_sender, mut socket_receiver) = socket.split();
     loop {
         tokio::select! {
-            received = receiver.recv() => {
-                match received {
+            broadcast_result = receiver.recv() => {
+                match broadcast_result {
                     Ok(payload) => {
                         if socket_sender.send(Message::Text(payload.into())).await.is_err() {
                             break;
@@ -317,7 +318,7 @@ async fn stream_to_client(
                     Err(broadcast::error::RecvError::Lagged(skipped)) => {
                         structured_log(
                             "client_backpressure",
-                            json!({ "clientId": client_id, "skippedSnapshots": skipped }),
+                            &json!({ "clientId": client_id, "skippedSnapshots": skipped }),
                         );
                     }
                     Err(broadcast::error::RecvError::Closed) => break,
@@ -325,16 +326,16 @@ async fn stream_to_client(
             }
             incoming = socket_receiver.next() => {
                 match incoming {
-                    Some(Ok(Message::Close(_))) | None | Some(Err(_)) => break,
+                    Some(Ok(Message::Close(_)) | Err(_)) | None => break,
                     Some(Ok(_)) => structured_log(
                         "malformed_message",
-                        json!({ "clientId": client_id, "reason": "unexpected_client_message" }),
+                        &json!({ "clientId": client_id, "reason": "unexpected_client_message" }),
                     ),
                 }
             }
         }
     }
-    structured_log("client_disconnection", json!({ "clientId": client_id }));
+    structured_log("client_disconnection", &json!({ "clientId": client_id }));
 }
 
 /// Run the loopback-only desktop gateway until the process is stopped.
@@ -401,7 +402,7 @@ where
         .with_state(state);
     let listener = tokio::net::TcpListener::bind(address).await?;
     let local_address = listener.local_addr()?;
-    structured_log("startup", json!({ "address": local_address }));
+    structured_log("startup", &json!({ "address": local_address }));
 
     let mut server_shutdown = shutdown_receiver;
     let server_result = axum::serve(listener, app)
@@ -415,7 +416,7 @@ where
         .await;
     let _ = shutdown_sender.send(true);
     let _ = producer.await;
-    structured_log("graceful_shutdown", json!({}));
+    structured_log("graceful_shutdown", &json!({}));
     server_result
 }
 

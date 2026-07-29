@@ -177,6 +177,7 @@ ApplicationWindow {
                             ["BATTERY", telemetry.batteryVoltage.toFixed(1) + " V"]
                         ]
                         delegate: Rectangle {
+                            id: metricDelegate
                             required property var modelData
                             Layout.fillWidth: true
                             Layout.fillHeight: true
@@ -185,8 +186,8 @@ ApplicationWindow {
                             Column {
                                 anchors.centerIn: parent
                                 spacing: 12
-                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData[0]; color: "#8C9AAF"; font.pixelSize: 16 }
-                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData[1]; color: "#F4F7FB"; font.pixelSize: 27; font.bold: true }
+                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: metricDelegate.modelData[0]; color: "#8C9AAF"; font.pixelSize: 16 }
+                                Text { anchors.horizontalCenter: parent.horizontalCenter; text: metricDelegate.modelData[1]; color: "#F4F7FB"; font.pixelSize: 27; font.bold: true }
                             }
                         }
                     }
@@ -205,13 +206,14 @@ ApplicationWindow {
                     ["OIL", telemetry.lowOilPressureWarning]
                 ]
                 delegate: Rectangle {
+                    id: warningDelegate
                     required property var modelData
-                    visible: modelData[1]
+                    visible: warningDelegate.modelData[1]
                     width: 118
                     height: 38
                     radius: 8
                     color: "#FF4057"
-                    Text { anchors.centerIn: parent; text: modelData[0]; color: "white"; font.bold: true }
+                    Text { anchors.centerIn: parent; text: warningDelegate.modelData[0]; color: "white"; font.bold: true }
                 }
             }
             Rectangle {

@@ -26,8 +26,7 @@ QtObject {
     readonly property bool lowFuelWarning: telemetryState.data.warnings.lowFuel
     readonly property bool lowOilPressureWarning: telemetryState.data.warnings.lowOilPressure
 
-    TelemetryState {
-        id: telemetryState
+    property TelemetryState telemetryState: TelemetryState {
     }
 
     property WebSocket socket: WebSocket {
@@ -37,7 +36,7 @@ QtObject {
         onStatusChanged: {
             telemetryState.setTransportConnected(status === WebSocket.Open)
             if (status === WebSocket.Closed || status === WebSocket.Error)
-                reconnect.start()
+                store.reconnect.start()
         }
     }
 
