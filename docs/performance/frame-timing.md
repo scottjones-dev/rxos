@@ -16,3 +16,20 @@ scan-out, touch-to-photon latency, compositor queuing or driver-display
 readability. Offscreen, Xvfb and representative-hardware results must be kept
 separate. CPU and frame-time values are observational until repeated
 environment-matched runs establish variance.
+
+## Milestone 1.4 observation
+
+In extended run `30461002292`, the cabin Performance page produced 38,807 frame
+swap events over approximately 602 seconds. The bounded buffer retained the
+latest 36,000 intervals and reported:
+
+- median 6.786 ms;
+- p95 29.923 ms;
+- p99 40.881 ms;
+- maximum 51.917 ms;
+- 16,427 intervals above 16.7 ms, 1,057 above 33.3 ms, two above 50 ms and none
+  above 100 ms.
+
+The mixture of short and long intervals is consistent with bursty offscreen
+swap signalling, so these values establish instrumentation and a host baseline,
+not smoothness on a physical display.

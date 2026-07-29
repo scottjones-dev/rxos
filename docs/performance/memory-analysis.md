@@ -19,3 +19,17 @@ These descriptive boundaries are investigation aids, not target-hardware
 budgets. A leak conclusion also requires reproduction and resource-level
 profiling. Thread and file-descriptor growth is reviewed independently because
 stable memory can conceal a resource leak.
+
+## Milestone 1.4 observation
+
+Extended run `30461002292` provided 600 one-second samples of the cabin
+Performance scenario at 60 Hz. The latter-half RSS range was 87,184–87,964 KiB.
+The fitted RSS and private-dirty slopes were approximately 99 KiB/min. Threads
+were stable at six and file descriptors were stable at twelve in the settled
+period.
+
+The automated and reviewed classification is **bounded warm-up** for this
+specific release/offscreen/software host observation. It is not proof that
+longer runs or representative hardware are leak-free. A 30–60-minute soak and
+allocation-level profiling remain appropriate if later changes produce a
+repeatable positive trend.
